@@ -30,7 +30,7 @@ export function generateDots(options: Message, constants) {
 }
 
 export function createMessage(options: Message, constants={USDInterval: 500, uniswapPair: "0x684b00a5773679f88598a19976fbeb25a68e9a5f"}) {
-     return `${options.feedType == "uniswapBuy" ? "🚀" : "👹"} *1 EXRD = ${options.radixInUsd.toFixed(4)}*\n` +
+     return `${options.feedType == "uniswapBuy" ? "🚀" : "👹"} *1 EXRD = ${options.radixInUsd.toFixed(4)} USDC*\n` +
             `${options.feedType == "uniswapBuy" ? "Bought" : "Sold"} *${numWithCommas(Math.ceil(options.amountRadix))} EXRD* for *${numWithCommas(Math.ceil(options.amountRadixInUsd))} USDC* on Uniswap (Gas Fee: $${numWithCommas(Math.ceil(options.transactionFeeInUsd))})\n\n` +
             `${generateDots(options, constants)}\n\n` +
             `From address: [${shortenAddress(options.fromAddress)}](${createEtherscanLink("address", options.fromAddress)})\n\n` +
