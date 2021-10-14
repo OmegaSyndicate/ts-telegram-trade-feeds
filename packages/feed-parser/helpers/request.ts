@@ -19,7 +19,7 @@ export async function request(type: "GET" | "POST", url: string, config?, logger
     } catch(error) {
         const errorMessage = `An error occurred during the request.\n${error}`;
         console.error(errorMessage);
-        logger.error(errorMessage);
+        // logger.error(errorMessage);
 
         await sleep(5000);
         return await request(type, url, config);
