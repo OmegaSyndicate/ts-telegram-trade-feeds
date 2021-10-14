@@ -1,0 +1,17 @@
+{
+    "ts-node": {
+        "transpileOnly": false,
+        "files": true,
+        "compilerOptions": {
+            "resolveJsonModule": true
+        }
+    },
+    "compilerOptions": {
+        "resolveJsonModule": true,
+        "target": "esnext",
+        "module": "commonjs",
+        "outDir": "../feed-telegram-bot-dist",
+        "moduleResolution": "node"
+    },
+    "exclude": ["config.json"]
+}
