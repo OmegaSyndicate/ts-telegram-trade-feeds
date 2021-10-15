@@ -16,20 +16,22 @@ async function synchronization() {
     const parser = sync(producer.getLatestMessage.bind(producer), workerData, logger);
     // Synchronization
     let data;
-    do {
-        try {
-            data = (await parser.next()).value;
-        } catch(err) {
-            logger.error(err);
-            break;
-        }
-        if(data.length) {
-            await producer.sendMessages(data);
-            stats += data.length;
-        }
-    } while(data.length);
-    await new Promise(resolve => setTimeout(resolve, workerData.synchronizeIntervalMs));
-    synchronization();
+    while(true) {
+        do {
+            try {
+                data = (await parser.next()).value;
+            } catch(err) {
+                console.error(err);
+                logger.error(err);
+                break;
+            }
+            if(data.length) {
+                await producer.sendMessages(data);
+                stats += data.length;
+            }
+        } while(data.length);
+        await new Promise(resolve => setTimeout(resolve, workerData.synchronizeIntervalMs));
+    }
 }
 
 
