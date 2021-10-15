@@ -1,8 +1,14 @@
 import { Worker } from 'worker_threads';
 import { readFileSync, watch } from 'fs';
+import { producerService } from './helpers/kafkaServices/producerService';
+import { Logger } from './helpers/logger';
+import { workerPoll } from './helpers/workerPoll';
 
 let config = JSON.parse(readFileSync('../config.json').toString());
 
+const workerInfo = `mainThreadParser-${config.mainWorkerName}`
+const logProducer = new producerService("logs", `logger-${workerInfo}`, config.kafkaSettings);
+const logger = new Logger(workerInfo, logProducer.sendMessages.bind(logProducer))
 interface IWorkers {
     worker: Worker;
     config: Object;
@@ -12,8 +18,18 @@ interface IWorkers {
 let workers: {[key: string]: IWorkers} = {};
 
 function createWorker(token): Worker {
-    delete token.publishers;
-    return new Worker('./worker/index.js', { workerData: token })
+    const worker = new Worker('./worker/index', { workerData: token, stdout: true })
+    const parserName = `parser-${token.token}-${token.type}`;
+    worker.on('error', (err) => {
+        logger.error(`${parserName}\n\n${err}`);
+    });
+    worker.on('message', (message) => {
+        console.log(message);
+    })
+    worker.on('exit', (code) => {
+        logger.error(`${parserName} stopped with code ${code}`);
+    });
+    return worker;
 }
 
 function workerKey(token, type) {
@@ -27,6 +43,7 @@ config.tokens.forEach(token => {
         // Logger
     } else {
         token.kafkaSettings = config.kafkaSettings;
+        delete token.publishers;
         workers[key] = {
              worker: createWorker(token),
              config: token,
@@ -35,10 +52,6 @@ config.tokens.forEach(token => {
     }
 });
 
-// setTimeout(() => {
-//     console.log(workers);
-//     console.log(workers["LAMBO-uniswap-exrd"].worker.performance.eventLoopUtilization());
-// }, 100)
-// console.log(workers);
 
-// createWorker(config.tokens[0]);
+workerPoll(workers, logger);
+setInterval(workerPoll.bind(null, workers, logger), config.workerPoll)

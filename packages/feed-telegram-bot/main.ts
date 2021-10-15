@@ -1,9 +1,14 @@
 import { Worker } from 'worker_threads';
 import { readFileSync, watch } from 'fs';
+import { Logger } from '../feed-parser/helpers/logger';
+import { producerService } from '../feed-parser/helpers/kafkaServices/producerService';
 // import * as config from '../config.json'
 
 let config = JSON.parse(readFileSync('../config.json').toString());
 
+const workerInfo = `mainThreadBot-${config.mainWorkerName}`
+const logProducer = new producerService("logs", `logger-${workerInfo}`, config.kafkaSettings);
+const logger = new Logger(workerInfo, logProducer.sendMessages.bind(logProducer))
 interface IWorkers {
     worker: Worker;
     config: Object;
@@ -13,7 +18,15 @@ interface IWorkers {
 let publishers: {[key: string]: IWorkers} = {};
 
 function createPublisher(publisher, type): Worker {
-    return new Worker(`./workers/${type}.worker.js`, { workerData: publisher })
+    const worker = new Worker(`./workers/${type}.worker.js`, { workerData: publisher, stdout: true })
+    const publisherName = `publisher-${publisher.topic}-${publisher.channel}`;
+    worker.on('error', (err) => {
+        logger.error(`${publisherName} in file ${type}\n\n${err}`);
+    });
+    worker.on('exit', (code) => {
+        logger.error(`${publisherName} in file ${type} stopped with code ${code}`);
+    });
+    return worker;
 }
 
 function publisherKey({ token, type, channel }) {
