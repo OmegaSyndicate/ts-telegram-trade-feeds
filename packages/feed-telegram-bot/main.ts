@@ -2,6 +2,7 @@ import { Worker } from 'worker_threads';
 import { readFileSync, watch } from 'fs';
 import { Logger } from '../feed-parser/helpers/logger';
 import { producerService } from '../feed-parser/helpers/kafkaServices/producerService';
+import { workerPoll } from '../feed-parser/helpers/workerPoll';
 // import * as config from '../config.json'
 
 let config = JSON.parse(readFileSync('../config.json').toString());
@@ -71,3 +72,6 @@ function createLogger() {
 }
 
 createLogger()
+
+workerPoll(publishers, logger);
+setInterval(workerPoll.bind(null, publishers, logger), config.workerPoll)

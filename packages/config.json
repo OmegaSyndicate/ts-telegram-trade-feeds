@@ -1,8 +1,9 @@
 {
-    "botToken": "",
+    "botToken": "2018560301:AAFYYdALuxX_ldHT91iJ3oYUxzjBDvjX6r4",
     "mainWorkerName": "mainWorker",
+    "workerPoll":  43200,
     "kafkaSettings": {
-        "brokers": [ "schegloff.com:9092" ]
+        "brokers": [ "127.0.0.1:9092" ]
     },
     "logsChat": {
         "channel": -1001571344024
@@ -12,7 +13,7 @@
             "token": "LAMBO",
             "type": "uniswap-exrd-ascending",
             "apiUrl": "https://api-exrd.wisetoken.me",
-            "synchronizeIntervalMs": 10000,
+            "synchronizeIntervalMs": 30000,
             "publishers": [
                 {
                     "channel": "@exrdbpall",
@@ -34,6 +35,25 @@
                     "minUSD": 100000,
                     "withSync" : true,
                     "uniswapPair": "0x684b00a5773679f88598a19976fbeb25a68e9a5f"
+                }
+            ]
+        },
+        {
+            "token": "tXRDUSD",
+            "type": "bitfinex",
+            "synchronizeIntervalMs": 10000,
+            "publishers": [
+                {
+                    "channel": "@bitfinexfeedtest",
+                    "USDInterval": 1000,
+                    "minUSD": 0,
+                    "withSync" : true
+                },
+                {
+                    "channel": "@bitfinexnosync",
+                    "USDInterval": 1000,
+                    "minUSD": 0,
+                    "withSync" : true
                 }
             ]
         }

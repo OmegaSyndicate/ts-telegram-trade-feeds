@@ -20,7 +20,7 @@ export function createEtherscanLink(type: "address" | "tx", address: string) {
     return `https://etherscan.io/${type}/${address}`
 }
 
-export function generateDots(options: Message, constants) {
+export function generateDots(options: Message | any, constants) {
     var dots = options.amountRadixInUsd < 2*constants.USDInterval? 1: options.amountRadixInUsd / constants.USDInterval - 1;
     dots = dots > 1000 ? 1000 : dots;
     let message = "";
