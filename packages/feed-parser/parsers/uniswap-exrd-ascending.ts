@@ -30,7 +30,7 @@ export async function* sync(latestMessage, settings, logger) {
                     yield data = (await request("GET", url(settings.apiUrl, page, limit, fromTimestamp, toTimestamp))).data.map(transaction => JSON.stringify(transaction))
                 }
                 page++;
-            } while(data?.length)
+            } while(data?.length || offset == 100)
             page--;
         }
     }
