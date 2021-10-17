@@ -8,13 +8,16 @@ export async function* sync(latestMessage, settings, logger) {
         sort: 1
     };
     let data;
-    let latest = (await latestMessage())?.value;
     while(true) {
+        let latest = (await latestMessage())?.value;
         if(latest == undefined) {
             do {
+                console.log("In while");
                 await new Promise(resolve => setTimeout(resolve, 2000));
                 const { received, latestStart } = await makeRequest(settings.token, params);
-                params.start = latestStart;
+                if(latestStart) {
+                    params.start = latestStart + 1;
+                }
                 yield data = received.map(transaction => JSON.stringify(transaction));
             } while(data.length)
         } else {
@@ -23,12 +26,14 @@ export async function* sync(latestMessage, settings, logger) {
                 latest = undefined;
                 continue;
             }
-            params.start = latestTimestamp;
+            params.start = latestTimestamp + 1;
             while(true) {
                 await new Promise(resolve => setTimeout(resolve, 2000));
                 params.end = Date.now();
                 const { received, latestStart } = await makeRequest(settings.token, params);
-                params.start = latestStart;
+                if(latestStart) {
+                    params.start = latestStart + 1;
+                }
                 yield data = received.map(transaction => JSON.stringify(transaction));
             }
         }
@@ -44,7 +49,13 @@ interface IParams {
 
 async function makeRequest(token: string, params: IParams) {
     const received = await request("GET", `https://api-pub.bitfinex.com/v2/trades/${token}/hist`, { params });
-    return { received, latestStart: received.slice(-1)[0][1] }
+    let latestStart = 0;
+    if(received instanceof Array) {
+        if(received[received.length - 1] instanceof Array) {
+            latestStart = received[received.length - 1][1];
+        }
+    }
+    return { received, latestStart }
 }
 
 // (async () => {
