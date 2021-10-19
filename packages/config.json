@@ -1,7 +1,7 @@
 {
     "botToken": "2018560301:AAFYYdALuxX_ldHT91iJ3oYUxzjBDvjX6r4",
     "mainWorkerName": "mainWorker",
-    "workerPoll":  43200,
+    "workerPoll":  86400,
     "kafkaSettings": {
         "brokers": [ "127.0.0.1:9092" ]
     },

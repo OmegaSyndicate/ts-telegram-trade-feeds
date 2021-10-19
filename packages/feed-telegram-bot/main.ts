@@ -99,4 +99,4 @@ function synchronizeParallelPublishers() {
 
 
 workerPoll(publishers, logger);
-setInterval(workerPoll.bind(null, publishers, logger), config.workerPoll)
+setInterval(workerPoll.bind(null, publishers, logger), config.workerPoll * 1e3)
