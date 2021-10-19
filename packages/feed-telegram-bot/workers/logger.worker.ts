@@ -18,7 +18,7 @@ async function publish(message: Buffer) {
     return String(message);
 }
 
-consumer.processMessages(publish, bot.sendMessage.bind(bot), workerData.withSync);
+consumer.processMessages(publish.bind(null, workerData), bot.sendMessage.bind(bot), workerData.syncOffsetTime, workerData.withSync);
 
 
 parentPort.on("message", async (value) => {

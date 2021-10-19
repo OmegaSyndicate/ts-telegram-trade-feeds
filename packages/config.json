@@ -30,10 +30,17 @@
                     "uniswapPair": "0x684b00a5773679f88598a19976fbeb25a68e9a5f"
                 },
                 {
-                    "channel": "@exrdmin1",
+                    "channel": "@exrdmin1000",
                     "USDInterval": 1000,
-                    "minUSD": 100000,
-                    "withSync" : true,
+                    "minUSD": 1000,
+                    "withSync" : false,
+                    "uniswapPair": "0x684b00a5773679f88598a19976fbeb25a68e9a5f"
+                },
+                {
+                    "channel": "@testgeneralfeed",
+                    "USDInterval": 1000,
+                    "minUSD": 1000,
+                    "withSync" : false,
                     "uniswapPair": "0x684b00a5773679f88598a19976fbeb25a68e9a5f"
                 }
             ]
@@ -41,19 +48,50 @@
         {
             "token": "tXRDUSD",
             "type": "bitfinex",
-            "synchronizeIntervalMs": 10000,
+            "synchronizeIntervalMs": 20000,
             "publishers": [
                 {
                     "channel": "@bitfinexfeedtest",
-                    "USDInterval": 1000,
+                    "USDInterval": 100,
                     "minUSD": 0,
                     "withSync" : true
                 },
                 {
                     "channel": "@bitfinexnosync",
-                    "USDInterval": 1000,
+                    "USDInterval": 100,
                     "minUSD": 0,
+                    "withSync" : false
+                },
+                {
+                    "channel": "@bitfinexmin1",
+                    "USDInterval": 100,
+                    "minUSD": 1000,
                     "withSync" : true
+                },
+                {
+                    "channel": "@testgeneralfeed",
+                    "USDInterval": 1000,
+                    "minUSD": 1000,
+                    "withSync" : false
+                }
+            ]
+        },
+        {
+            "token": "EXRD-USDT",
+            "type": "kucoin",
+            "synchronizeIntervalMs": 20000,
+            "publishers": [
+                {
+                    "channel": "@kucoinfeed",
+                    "USDInterval": 1000,
+                    "minUSD": 1000,
+                    "withSync" : true
+                },
+                {
+                    "channel": "@testgeneralfeed",
+                    "USDInterval": 1000,
+                    "minUSD": 1000,
+                    "withSync" : false
                 }
             ]
         }

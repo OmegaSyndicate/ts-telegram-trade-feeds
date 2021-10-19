@@ -34,6 +34,7 @@ function publisherKey({ token, type, channel }) {
     return `${token}-${type}-${channel}`;
 }
 
+synchronizeParallelPublishers();
 config.tokens.forEach(token => {
     token.publishers.forEach((publisher: any) => {
         publisher.botToken = config.botToken;
@@ -52,7 +53,6 @@ config.tokens.forEach(token => {
             }
         }
     });
-    // createLogger();
 });
 
 
@@ -72,6 +72,29 @@ function createLogger() {
 }
 
 createLogger()
+
+function synchronizeParallelPublishers() {
+    let publishers: { [channel: string]: { tokenIndex: number, publisherIndex: number }[] } = {};
+    config.tokens.forEach((token, tokenIndex) => {
+        token.publishers.forEach((publisher, publisherIndex) => {
+            if(!publishers[publisher.channel]) {
+                publishers[publisher.channel] = [];
+            }
+            publishers[publisher.channel].push({ tokenIndex, publisherIndex });
+        });
+    });
+    Object.keys(publishers).forEach(function (publisherChannel) {
+        let publisherList = publishers[publisherChannel];
+        let syncAmountPubs = publisherList.length;
+        publisherList.forEach((publisher, syncOffsetTime) => {
+            let pub = config.tokens[publisher.tokenIndex]
+                  .publishers[publisher.publisherIndex];
+            config.tokens[publisher.tokenIndex]
+                .publishers[publisher.publisherIndex] = { ...pub, syncOffsetTime, syncAmountPubs };
+        })
+    })
+}
+
 
 workerPoll(publishers, logger);
 setInterval(workerPoll.bind(null, publishers, logger), config.workerPoll)

@@ -9,7 +9,7 @@ const topic = `${workerData.token}-${workerData.type}`;
 const workerInfo = `publisher-${topic}-${workerData.channel}`;
 const logProducer = new producerService("logs", `logger-${workerInfo}`, workerData.kafkaSettings);
 const logger = new Logger(workerInfo, logProducer.sendMessages.bind(logProducer))
-const bot = new telegramBot(workerData.botToken, workerData.channel, logger);
+const bot = new telegramBot(workerData.botToken, workerData.channel, logger, workerData.syncAmountPubs);
 const consumer = new consumerService(topic, workerInfo, workerInfo, workerData.kafkaSettings, logger);
 
 let stats = 0;
@@ -27,9 +27,7 @@ async function publish(workerData, message: Buffer) {
     }
 }
 
-console.log("Started");
-
-consumer.processMessages(publish.bind(null, workerData), bot.sendMessage.bind(bot), workerData.withSync);
+consumer.processMessages(publish.bind(null, workerData), bot.sendMessage.bind(bot), workerData.syncOffsetTime, workerData.withSync);
 
 
 parentPort.on("message", async (value) => {

@@ -12,12 +12,16 @@ export class consumerService {
         this.consumer = this.kafka.consumer({ groupId });
     }
 
-    async processMessages(messageParser, sendMessage, withSync = true) {
+    async processMessages(messageParser, sendMessage, syncOffset, withSync = true) {
         await this.consumer.connect();
         await this.consumer.subscribe({ topic: this.topic, fromBeginning: withSync });
+        let firstStart = true;
         await this.consumer.run({
             autoCommitThreshold: 1,
-            eachMessage: async({ topic, partition, message}) => {
+            eachMessage: async({ topic, partition, message }) => {
+                if(firstStart && syncOffset) {
+                    await new Promise(resolve => setTimeout(resolve, syncOffset * 3000));
+                }
                 let status 
                 try {
                     status = await sendMessage(await messageParser(message.value));

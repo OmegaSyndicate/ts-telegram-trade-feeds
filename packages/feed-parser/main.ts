@@ -18,7 +18,7 @@ interface IWorkers {
 let workers: {[key: string]: IWorkers} = {};
 
 function createWorker(token): Worker {
-    const worker = new Worker('./worker/index', { workerData: token, stdout: true })
+    const worker = new Worker('./worker/index.js', { workerData: token, stdout: true })
     const parserName = `parser-${token.token}-${token.type}`;
     worker.on('error', (err) => {
         logger.error(`${parserName}\n\n${err}`);
