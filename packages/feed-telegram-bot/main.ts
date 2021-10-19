@@ -62,7 +62,9 @@ function createLogger() {
         botToken: config.botToken,
         channel: config.logsChat.channel,
         kafkaSettings: config.kafkaSettings,
-        withSync: true
+        withSync: true,
+        syncOffsetTime: 0,
+        syncAmountPubs: 1
     }
     publishers['logs'] = {
         worker: createPublisher(logsPublisher, "logger"),
