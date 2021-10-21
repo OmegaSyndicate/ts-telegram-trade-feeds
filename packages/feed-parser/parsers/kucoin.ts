@@ -4,8 +4,8 @@ import { request } from "../helpers/request";
 
 export async function* sync(latestMessage, settings, logger) {
     while(true) {
-        await new Promise((resolve, reject) => setTimeout(resolve, 1000));
-        let latest = (await latestMessage())?.value;
+        console.log("test");
+        const latest = (await latestMessage())?.value;
         yield await makeRequest(settings.token, latest);
     }
 }
@@ -29,5 +29,5 @@ interface Transaction {
 }
 
 function transactionString(t: Transaction) {
-    return `${t.sequence}-${t.price}-${t.size}-${t.side}-${t.time}`;
+    return t.sequence;
 }
