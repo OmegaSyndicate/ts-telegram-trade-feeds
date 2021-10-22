@@ -20,10 +20,16 @@ async function synchronization() {
         do {
             try {
                 data = (await parser.next()).value;
+                if(data == undefined) {
+                    throw new Error("Generator function returned undefined. Has been rebooted");
+                } else if(!(data instanceof Array)) {
+                    throw new Error(`The generator function did not return an array. Has been rebooted.\n${data}`)
+                }
             } catch(err) {
                 console.error(err);
                 logger.error(err);
-                break;
+                synchronization();
+                return;
             }
             if(data.length) {
                 await producer.sendMessages(data);
