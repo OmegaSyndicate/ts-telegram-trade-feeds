@@ -14,7 +14,7 @@ async function makeRequest(symbol, latestString?) {
     let data: Transaction[] | [];
     if(latestString) {
         const latest: Transaction = JSON.parse(latestString);
-        data = received.filter((transaction) => Number(transaction.sequence) > Number(latest.sequence) && transaction.time >= latest.time);
+        data = received.filter((transaction: Transaction) => Number(transaction.sequence) > Number(latest.sequence) && transaction.time >= latest.time);
     } else {
         data = received;
     }
