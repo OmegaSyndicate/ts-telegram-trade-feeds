@@ -3,14 +3,18 @@ import { request } from '../helpers/request';
 const apiUrl = 'https://api.thegraph.com/subgraphs/name/omegasyndicate/defiplaza';
 
 export async function* sync(latestMessage, settings, logger) {
-    let token = await getToken(settings.token);
-    if(!token) {
-        logger.error("Token not found");
-    }
-    while(true) {
-        const latest = (await latestMessage())?.value;
-        console.log("LATEST", String(latest))
-        yield (await makeRequest(token, logger, latest)).map(t => JSON.stringify(t));
+    try {
+        let token = await getToken(settings.token);
+        if(!token) {
+            logger.error("Token not found");
+        }
+        while(true) {
+            const latest = (await latestMessage())?.value;
+            yield (await makeRequest(token, logger, latest)).map(t => JSON.stringify(t));
+        }
+    } catch(err) {
+        logger.error(err);
+        yield undefined;
     }
 }
 
@@ -46,7 +50,7 @@ async function makeRequest(token, logger?, latest?) {
         }
         return mergeTransactions(received);
     } else {
-        const lastObject = JSON.parse(latest);
+        const lastObject = JSON.parse(String(latest));
         let found: number = 0; // 0 or timestamp
         let amounts: searchType = {
             buy: 10,
