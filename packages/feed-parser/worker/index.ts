@@ -21,13 +21,14 @@ async function synchronization() {
             try {
                 data = (await parser.next()).value;
                 if(data == undefined) {
-                    throw new Error("Generator function returned undefined. Has been rebooted");
+                    throw new Error("Generator function returned undefined. Will reboot in 20 seconds.");
                 } else if(!(data instanceof Array)) {
-                    throw new Error(`The generator function did not return an array. Has been rebooted.\n${data}`)
+                    throw new Error(`The generator function did not return an array. Will reboot in 20 seconds.\n${data}`)
                 }
             } catch(err) {
                 console.error(err);
                 logger.error(err);
+                await new Promise(resolve => setTimeout(resolve, 20000));
                 synchronization();
                 return;
             }
