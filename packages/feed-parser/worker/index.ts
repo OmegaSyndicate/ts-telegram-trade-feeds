@@ -12,32 +12,39 @@ const producer = new producerService(topic, workerInfo, workerData.kafkaSettings
 let stats = 0;
 
 async function synchronization() {
-    const { sync } = await import(`../parsers/${workerData.type}`);
-    const parser = sync(producer.getLatestMessage.bind(producer), workerData, logger);
-    // Synchronization
-    let data;
-    while(true) {
-        do {
-            try {
-                data = (await parser.next()).value;
-                if(data == undefined) {
-                    throw new Error("Generator function returned undefined. Will reboot in 20 seconds.");
-                } else if(!(data instanceof Array)) {
-                    throw new Error(`The generator function did not return an array. Will reboot in 20 seconds.\n${data}`)
+    try {
+        const { sync } = await import(`../parsers/${workerData.type}`);
+        const parser = sync(producer.getLatestMessage.bind(producer), workerData, logger);
+        // Synchronization
+        let data;
+        while(true) {
+            do {
+                try {
+                    data = (await parser.next()).value;
+                    if(data == undefined) {
+                        throw new Error("Generator function returned undefined. Will reboot in 20 seconds.");
+                    } else if(!(data instanceof Array)) {
+                        throw new Error(`The generator function did not return an array. Will reboot in 20 seconds.\n${data}`)
+                    }
+                } catch(err) {
+                    console.error(err);
+                    logger.error(err);
+                    await new Promise(resolve => setTimeout(resolve, 20000));
+                    synchronization();
+                    return;
                 }
-            } catch(err) {
-                console.error(err);
-                logger.error(err);
-                await new Promise(resolve => setTimeout(resolve, 20000));
-                synchronization();
-                return;
-            }
-            if(data.length) {
-                await producer.sendMessages(data);
-                stats += data.length;
-            }
-        } while(data.length);
-        await new Promise(resolve => setTimeout(resolve, workerData.synchronizeIntervalMs));
+                if(data?.length) {
+                    await producer.sendMessages(data);
+                    stats += data?.length;
+                }
+            } while(data.length);
+            await new Promise(resolve => setTimeout(resolve, workerData.synchronizeIntervalMs));
+        }
+    } catch(err) {
+        logger.error(err);
+        logger.log("Will reboot in 30 seconds.");
+        await new Promise(resolve => setTimeout(resolve, 30000));
+        synchronization();
     }
 }
 

@@ -1,5 +1,4 @@
 import { request } from '../helpers/request';
-import { appendFile } from 'fs';
 
 const limit = 100;
 const fromTimestamp = 0;
@@ -7,37 +6,42 @@ const fromTimestamp = 0;
 export async function* sync(latestMessage, settings, logger) {
     let page = 0;
     let data;
-    while(true) {
-        const toTimestamp = new Date().getTime() / 1e3;
-        const latest = (await latestMessage())?.value;
-        console.log(String(latest));
-        if(latest == undefined) {
-            page = 0;
-            do {
-                yield data = (await request("GET", url(settings.apiUrl, page++, limit, fromTimestamp, toTimestamp))).data.map(transaction => JSON.stringify(transaction))
-            } while(data?.length);
-            page--;
-        } else {
-            const latestObject = JSON.parse(String(latest));
-            const searchedPage = page = await searchTransactionPage(settings.apiUrl, latestObject, toTimestamp);
-            const received = (await request("GET", url(settings.apiUrl, page, limit, fromTimestamp, toTimestamp))).data;
-            const transactionHashes = received.map(searchString);
-            const offset = transactionHashes.indexOf(searchString(latestObject)) + 1;
-            do {
-                if(searchedPage == page) {
-                    yield data = received.slice(offset)?.map(transaction => JSON.stringify(transaction));
-                } else {
-                    yield data = (await request("GET", url(settings.apiUrl, page, limit, fromTimestamp, toTimestamp))).data.map(transaction => JSON.stringify(transaction))
-                }
-                page++;
-            } while(data?.length || offset == 100)
-            page--;
+    try {
+        while(true) {
+            const toTimestamp = new Date().getTime() / 1e3;
+            const latest = (await latestMessage())?.value;
+            console.log(String(latest));
+            if(latest == undefined) {
+                page = 0;
+                do {
+                    yield data = (await request("GET", url(settings.apiUrl, page++, limit, fromTimestamp, toTimestamp), {}, logger)).data?.map(transaction => JSON.stringify(transaction))
+                } while(data?.length);
+                page--;
+            } else {
+                const latestObject = JSON.parse(String(latest));
+                const searchedPage = page = await searchTransactionPage(settings.apiUrl, latestObject, toTimestamp, logger);
+                const received = (await request("GET", url(settings.apiUrl, page, limit, fromTimestamp, toTimestamp), {}, logger)).data;
+                const transactionHashes = received?.map(searchString);
+                const offset = transactionHashes?.indexOf(searchString(latestObject)) + 1;
+                do {
+                    if(searchedPage == page) {
+                        yield data = received.slice(offset)?.map(transaction => JSON.stringify(transaction));
+                    } else {
+                        yield data = (await request("GET", url(settings.apiUrl, page, limit, fromTimestamp, toTimestamp), logger)).data?.map(transaction => JSON.stringify(transaction))
+                    }
+                    page++;
+                } while(data?.length || offset == 100)
+                page--;
+            }
         }
+    } catch(err) {
+        logger.error(err);
+        yield undefined;
     }
 }
 
 function searchString(transaction): string {
-    return `${transaction.transactionHash}-${transaction.blockNumber}-${transaction.amountRadix}`;
+    return `${transaction.transactionHash}-${transaction.blockNumber}-${transaction[`amountWise`]}`;
 }
 
 async function searchFirstTransactionPage(apiUrl, toTimestamp) {
@@ -56,17 +60,19 @@ async function searchFirstTransactionPage(apiUrl, toTimestamp) {
     return maxPage;
 }
 
-async function searchTransactionPage(apiUrl, latest, toTimestamp) {
+async function searchTransactionPage(apiUrl, latest, toTimestamp, logger) {
     let page = await searchFirstTransactionPage(apiUrl, toTimestamp);
     for(;;page--) {
-        const received = (await request("GET", url(apiUrl, page, limit, fromTimestamp, toTimestamp))).data;
-        const transactionHashes = received.map(searchString)
+        const received = (await request("GET", url(apiUrl, page, limit, fromTimestamp, toTimestamp), logger)).data;
+        const transactionHashes = received?.map(searchString)
         console.log(page)
-        if(~transactionHashes.indexOf(searchString(latest))) {
+        if(~transactionHashes?.indexOf(searchString(latest))) {
             break;
         }
         if(!received.length || page <= 0) {
             console.error("Last post not found");
+            logger.error("Last post not found");
+            return undefined;
             break;
         }
     }

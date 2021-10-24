@@ -1,6 +1,8 @@
+import { Worker } from "worker_threads";
+
 export async function workerPoll(workers, logger) {
     let messages: any = Object.keys(workers).map(async (worker) => {
-        const thisWorker = workers[worker].worker;
+        const thisWorker: Worker = workers[worker].worker;
         thisWorker.postMessage({ ping: true });
         const message: any = await new Promise((resolve) => {
             const callback = (message) => { resolve(message) };
