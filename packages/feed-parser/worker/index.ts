@@ -21,7 +21,8 @@ async function synchronization() {
             do {
                 try {
                     data = (await parser.next()).value;
-                    if(data == undefined) {
+                    console.log("Data", data);
+                    if(data == undefined || !data) {
                         throw new Error("Generator function returned undefined. Will reboot in 20 seconds.");
                     } else if(!(data instanceof Array)) {
                         throw new Error(`The generator function did not return an array. Will reboot in 20 seconds.\n${data}`)
@@ -30,8 +31,7 @@ async function synchronization() {
                     console.error(err);
                     logger.error(err);
                     await new Promise(resolve => setTimeout(resolve, 20000));
-                    synchronization();
-                    return;
+                    return synchronization();
                 }
                 if(data?.length) {
                     await producer.sendMessages(data);
@@ -44,7 +44,7 @@ async function synchronization() {
         logger.error(err);
         logger.log("Will reboot in 30 seconds.");
         await new Promise(resolve => setTimeout(resolve, 30000));
-        synchronization();
+        return synchronization();
     }
 }
 

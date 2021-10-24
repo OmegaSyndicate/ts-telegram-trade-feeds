@@ -17,11 +17,13 @@ export async function request(type: "GET" | "POST", url: string, config?, logger
         }
         return response.data;
     } catch(error) {
-        const errorMessage = `An error occurred during the request.\n${error}`;
+        const errorMessage = `An error occurred during the request. I repeat the request in 5 seconds.\n${error}`;
         console.error(errorMessage);
-        // logger.error(errorMessage);
+        if(logger) {
+            logger.log(errorMessage);
+        }
 
         await sleep(5000);
-        return await request(type, url, config);
+        return await request(type, url, config, logger);
     }
 }

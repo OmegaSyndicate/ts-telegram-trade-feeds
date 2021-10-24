@@ -14,6 +14,7 @@ export async function workerPoll(workers, logger) {
         });
         if(message == "timeout") {
             console.error(`${worker} timeout`);
+            logger.error(`${worker} timeout`);
             workers[worker].isRunning = false;
             return `❌ Worker ${worker} is not running.`;
         }
