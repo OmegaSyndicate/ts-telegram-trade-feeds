@@ -18,6 +18,7 @@ async function synchronization() {
         // Synchronization
         let data;
         while(true) {
+            console.log("In worker while");
             do {
                 try {
                     data = (await parser.next()).value;
@@ -37,6 +38,7 @@ async function synchronization() {
                     await producer.sendMessages(data);
                     stats += data?.length;
                 }
+                await new Promise(resolve => setTimeout(resolve, 500));
             } while(data.length);
             await new Promise(resolve => setTimeout(resolve, workerData.synchronizeIntervalMs));
         }
@@ -49,7 +51,14 @@ async function synchronization() {
 }
 
 
-synchronization();
+async function restarter() {
+    let sync = await synchronization();
+    console.log(sync);
+    logger.error("Synchronization stopped unexpectedly. A restart was made.");
+    restarter();
+}
+
+const worker = restarter();
 
 setInterval(() => {
     parentPort.postMessage(`The ${workerInfo} received ${stats} transactions`);
@@ -67,5 +76,6 @@ parentPort.on("message", async (value) => {
     }
     if(value?.ping) {
         parentPort.postMessage({ workerInfo, isRunning: true, stats })
+        console.log(worker.then(t => t));
     }
 });

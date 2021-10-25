@@ -15,15 +15,20 @@ const consumer = new consumerService(topic, workerInfo, workerInfo, workerData.k
 let stats = 0;
 
 async function publish(workerData, message: Buffer) {
-    const { parser } = await import(`../messageParsers/${workerData.parser ? workerData.parser : workerData.type}`);
-    const { createMessage } = await import(`../messageCreators/${workerData.messageCreator ? workerData.messageCreator : workerData.type}`);
-    const { validate } = await import(`../validators/${workerData.validator ? workerData.validator : workerData.type}`);
-    const parsedMessage = await parser(message);
-    if(await validate(workerData, parsedMessage)) {
-        stats++;
-        return await createMessage(parsedMessage, workerData);
-    } else {
-        return false;
+    try {
+        const { parser } = await import(`../messageParsers/${workerData.parser ? workerData.parser : workerData.type}`);
+        const { createMessage } = await import(`../messageCreators/${workerData.messageCreator ? workerData.messageCreator : workerData.type}`);
+        const { validate } = await import(`../validators/${workerData.validator ? workerData.validator : workerData.type}`);
+        const parsedMessage = await parser(message);
+        if(await validate(workerData, parsedMessage)) {
+            stats++;
+            return await createMessage(parsedMessage, workerData);
+        } else {
+            return false;
+        }
+    } catch(err) {
+        console.error(err);
+        logger.error(err);
     }
 }
 

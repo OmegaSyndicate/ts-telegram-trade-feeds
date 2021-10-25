@@ -53,13 +53,14 @@ export async function* sync(latestMessage, settings, logger) {
             yield undefined;
         }
     }
+    yield undefined;
 }
 
 function searchString(transaction): string {
     return `${transaction.transactionHash}-${transaction.blockNumber}-${transaction[`amountWise`]}`;
 }
 
-async function searchFirstTransactionPage(apiUrl, toTimestamp,logger) {
+async function searchFirstTransactionPage(apiUrl, toTimestamp, logger) {
     let maxPage = 0;
     let maxStep = 100;
     while(true) {
@@ -73,6 +74,7 @@ async function searchFirstTransactionPage(apiUrl, toTimestamp,logger) {
         } else {
             maxStep = Math.ceil(maxStep / 2);
         }
+        console.log(maxPage, maxStep);
     }
     return maxPage;
 }
