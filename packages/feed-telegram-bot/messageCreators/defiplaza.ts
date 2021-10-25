@@ -24,7 +24,7 @@ export interface Message {
 
 export function createMessage(options: any, constants) {
     options.type = options.inputToken.symbol == constants.token ? "Bought" : "Sold";
-    const gasPriceUSD = Number(options.type == "Bought" ? options.outputToken.tokenPriceUSD : options.inputToken.tokenPriceUSD);
+    const gasPriceUSD = options.ethPriceUSD;
     const radixInUsd = Number(options.inputToken.symbol == constants.token ? options.inputToken.tokenPriceUSD : options.outputToken.tokenPriceUSD)
     const radixAmount = Number(options.inputToken.symbol == constants.token ? options.inputAmount : options.outputAmount);
     const otherAmount = Number(options.outputToken.symbol == constants.token ? options.inputAmount : options.outputAmount);

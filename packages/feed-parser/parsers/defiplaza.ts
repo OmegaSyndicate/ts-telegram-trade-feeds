@@ -4,7 +4,7 @@ const apiUrl = 'https://api.thegraph.com/subgraphs/name/omegasyndicate/defiplaza
 
 export async function* sync(latestMessage, settings, logger) {
     try {
-        let token = await getToken(settings.token);
+        let token = await getToken(settings.token, logger);
         if(!token) {
             logger.error("Token not found");
         }
@@ -18,7 +18,7 @@ export async function* sync(latestMessage, settings, logger) {
     }
 }
 
-async function getToken(symbol) {
+async function getToken(symbol, logger) {
     let token = await request("POST", apiUrl, { query: `query {
         tokens(orderBy: swapCount, orderDirection: desc, where: {symbol: "eXRD"}) {
           id
@@ -26,11 +26,11 @@ async function getToken(symbol) {
           tokenAmount
           swapCount
         }
-      }`});
+      }`}, logger);
     return token.data.tokens[0].id;
 }
 
-async function makeRequest(token, logger?, latest?) {
+async function makeRequest(token, logger, latest?) {
     let received: receivedType = {
         buy: [],
         sold: []
@@ -39,11 +39,14 @@ async function makeRequest(token, logger?, latest?) {
         for(let type = 0; type <= 1; type++) { // type 0 == 'buy', type 1 == 'sold'
             let typeTransaction: "buy" | "sold" = type ? "sold" : "buy";
             for(let amount = 1000, offset = 0; amount >= 1000; offset += amount) {
-                let tempReceived = await request("POST", apiUrl, { query: createSwapsQuery(typeTransaction, token, 1000, offset) });
+                let tempReceived = await request("POST", apiUrl, { query: createSwapsQuery(typeTransaction, token, 1000, offset) }, logger);
                 if(tempReceived['errors']) {
                     logger.error(tempReceived.errors);
                     return;
                 }
+                tempReceived.data.swaps = tempReceived.data.swaps.map((t) => 
+                    Object.assign(t, { ethPriceUSD: (type ? t.outputToken.symbol : t.inputToken.symbol) == "ETH" ? (type ? t.outputToken.tokenPriceUSD : t.inputToken.tokenPriceUSD) : tempReceived.data.token.tokenPriceUSD })
+                )
                 received[typeTransaction] = received[typeTransaction].concat(tempReceived.data.swaps);
                 amount = tempReceived.data.swaps.length;
             }
@@ -73,6 +76,9 @@ async function makeRequest(token, logger?, latest?) {
             if(!(tempReceived.data?.swaps.length)) {
                 continue; // skip if there is nothing to send
             }
+            tempReceived.data.swaps = tempReceived.data.swaps.map((t) => 
+                    Object.assign(t, { ethPriceUSD: (type ? t.outputToken.symbol : t.inputToken.symbol) == "ETH" ? (type ? t.outputToken.tokenPriceUSD : t.inputToken.tokenPriceUSD) : tempReceived.data.token.tokenPriceUSD })
+            )
             let founded = 0;
             if(found) {
                 // if the transaction is found, then we cut it to the desired point in time
@@ -162,5 +168,11 @@ function createSwapsQuery(type: "buy" | "sold", token: string, first = 1000, ski
             tokenPriceUSD
           }
           swapUSD
-        }}`.split(/ |\n/gm).filter(el => el).join(' ');
+        }
+        token(id: "0x0000000000000000000000000000000000000000") {
+            id
+            symbol
+            tokenPriceUSD
+        }
+    }`.split(/ |\n/gm).filter(el => el).join(' ');
 }
