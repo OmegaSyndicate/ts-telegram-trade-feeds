@@ -1,9 +1,9 @@
 {
     "botToken": "2018560301:AAFYYdALuxX_ldHT91iJ3oYUxzjBDvjX6r4",
     "mainWorkerName": "mainWorker",
-    "workerPoll":  86400,
+    "workerPoll": 100,
     "kafkaSettings": {
-        "brokers": [ "127.0.0.1:9092" ]
+        "brokers": [ "localhost:9092" ]
     },
     "logsChat": {
         "channel": -1001571344024
@@ -16,31 +16,10 @@
             "synchronizeIntervalMs": 30000,
             "publishers": [
                 {
-                    "channel": "@exrdbpall",
+                    "channel": "@DefiPlazaETH",
                     "USDInterval": 1000,
-                    "minUSD": 0,
+                    "minUSD": 10000,
                     "withSync" : true,
-                    "uniswapPair": "0x684b00a5773679f88598a19976fbeb25a68e9a5f"
-                },
-                {
-                    "channel": "@exrdnosync",
-                    "USDInterval": 1000,
-                    "minUSD": 0,
-                    "withSync" : false,
-                    "uniswapPair": "0x684b00a5773679f88598a19976fbeb25a68e9a5f"
-                },
-                {
-                    "channel": "@exrdmin1000",
-                    "USDInterval": 1000,
-                    "minUSD": 1000,
-                    "withSync" : false,
-                    "uniswapPair": "0x684b00a5773679f88598a19976fbeb25a68e9a5f"
-                },
-                {
-                    "channel": "@testgeneralfeed",
-                    "USDInterval": 1000,
-                    "minUSD": 1000,
-                    "withSync" : false,
                     "uniswapPair": "0x684b00a5773679f88598a19976fbeb25a68e9a5f"
                 }
             ]
@@ -51,28 +30,10 @@
             "synchronizeIntervalMs": 20000,
             "publishers": [
                 {
-                    "channel": "@bitfinexfeedtest",
+                    "channel": "@DefiPlazaETH",
                     "USDInterval": 100,
                     "minUSD": 0,
                     "withSync" : true
-                },
-                {
-                    "channel": "@bitfinexnosync",
-                    "USDInterval": 100,
-                    "minUSD": 0,
-                    "withSync" : false
-                },
-                {
-                    "channel": "@bitfinexmin1",
-                    "USDInterval": 100,
-                    "minUSD": 1000,
-                    "withSync" : true
-                },
-                {
-                    "channel": "@testgeneralfeed",
-                    "USDInterval": 1000,
-                    "minUSD": 1000,
-                    "withSync" : false
                 }
             ]
         },
@@ -82,16 +43,23 @@
             "synchronizeIntervalMs": 20000,
             "publishers": [
                 {
-                    "channel": "@kucoinfeed",
+                    "channel": "@DefiPlazaETH",
                     "USDInterval": 1000,
-                    "minUSD": 1000,
+                    "minUSD": 0,
                     "withSync" : true
-                },
+                }
+            ]
+        },
+        {
+            "token": "eXRD",
+            "type": "defiplaza",
+            "synchronizeIntervalMs": 20000,
+            "publishers": [
                 {
-                    "channel": "@testgeneralfeed",
+                    "channel": "@DefiPlazaETH",
                     "USDInterval": 1000,
-                    "minUSD": 1000,
-                    "withSync" : false
+                    "minUSD": 0,
+                    "withSync": true
                 }
             ]
         }
