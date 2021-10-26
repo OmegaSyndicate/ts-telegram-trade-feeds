@@ -17,7 +17,15 @@ export class telegramBot {
         if(!message) return;
         await new Promise(resolve => setTimeout(resolve, 3100 * this.amountPubs));
         try {
-            await this.bot.sendMessage(this.channel, message, {parse_mode: this.markdownEnable ?  "markdown" : undefined, disable_web_page_preview: true})
+            if(message.length > 4096) { // Telegram limitation on message length
+                let parts = message.length / 4096;
+                for(let i = 0; i <= parts; i++) {
+                    await this.sendMessage(message.slice(i * 4096, (i+1) * 4096));
+                }
+
+            } else {
+                await this.bot.sendMessage(this.channel, message, {parse_mode: this.markdownEnable ?  "markdown" : undefined, disable_web_page_preview: true})
+            }
         } catch(err) {
             this.logger.error(err);
             console.error(err);
