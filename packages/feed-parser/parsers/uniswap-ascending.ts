@@ -2,29 +2,52 @@ import { request } from '../helpers/request';
 
 const limit = 100;
 const fromTimestamp = 0;
+let stakingType = "uniswap";
+let token;
 
 export async function* sync(latestMessage, settings, logger) {
+    token = settings.token;
+    if(settings.stakingType) {
+        stakingType = settings.stakingType;
+    }
     let page = 0;
     let data;
     console.log("started");
     while(true) {
         console.log("In while")
         try {
-            const toTimestamp = new Date().getTime() / 1e3;
+            const toTimestamp = Math.ceil(new Date().getTime() / 1e3);
             const latest = (await latestMessage())?.value;
             console.log(String(latest));
             if(latest == undefined) {
+                console.log("latest no");
                 page = 0;
                 do {
                     console.log(`In sync page: ${page}`);
-                    yield data = (await request("GET", url(settings.apiUrl, page++, limit, fromTimestamp, toTimestamp), {}, logger)).data?.map(transaction => JSON.stringify(transaction))
+                    let URL = url(settings.apiUrl, page++, limit, fromTimestamp, toTimestamp);
+                    const received = await checkStatus(URL, logger);
+                    if(!received) {
+                        logger.error(`This page returned an invalid status, I skip it. URL: ${URL}`);
+                        continue;
+                    }
+                    yield data = received?.map(transaction => JSON.stringify(transaction))
                 } while(data?.length);
                 page--;
             } else {
                 console.log("Latest is present")
                 const latestObject = JSON.parse(String(latest));
-                const searchedPage = page = await searchTransactionPage(settings.apiUrl, latestObject, toTimestamp, logger);
-                const received = (await request("GET", url(settings.apiUrl, page, limit, fromTimestamp, toTimestamp), {}, logger)).data;
+                let searchedPage;
+                if(!page) {
+                    searchedPage = page = await searchTransactionPage(settings.apiUrl, latestObject, toTimestamp, logger);
+                } else {
+                    searchedPage = page;
+                }
+                let URL = url(settings.apiUrl, page, limit, fromTimestamp, toTimestamp);
+                const received = await checkStatus(URL, logger);
+                if(!received) {
+                    logger.error(`This page returned an invalid status, I skip it. URL: ${URL}`);
+                    page++;
+                }
                 const transactionHashes = received?.map(searchString);
                 const offset = transactionHashes?.indexOf(searchString(latestObject)) + 1;
                 if(!offset || searchedPage == undefined || !transactionHashes || !received || !latestObject) {
@@ -41,7 +64,14 @@ export async function* sync(latestMessage, settings, logger) {
                     if(searchedPage == page) {
                         yield data = received?.slice(offset)?.map(transaction => JSON.stringify(transaction));
                     } else {
-                        yield data = (await request("GET", url(settings.apiUrl, page, limit, fromTimestamp, toTimestamp), {}, logger)).data?.map(transaction => JSON.stringify(transaction))
+                        URL = url(settings.apiUrl, page, limit, fromTimestamp, toTimestamp);
+                        data = await checkStatus(URL, logger);
+                        if(!data) {
+                            logger.error(`This page returned an invalid status, I skip it. URL: ${URL}`);
+                            page++;
+                            continue;
+                        }
+                        yield data?.map(transaction => JSON.stringify(transaction))
                     }
                     page++;
                 } while(data?.length || offset == 100)
@@ -49,15 +79,41 @@ export async function* sync(latestMessage, settings, logger) {
                 console.log("page", page);
             }
         } catch(err) {
-            logger.error(err);
+            logger.error(`${err}\n${err.stack}`);
+            console.error(err);
             yield undefined;
         }
     }
     yield undefined;
 }
 
+// async function firstStartStats(toTimestamp) {
+//     for(let i = 7; i >= 1; i--) {
+//         let date = new Date().setDate(new Date(toTimestamp * 1e3).getDate() - i)
+        
+//     }
+// }
+
+// firstStartStats(new Date().getTime() / 1e3);
+
+async function checkStatus(URL: string, logger, attempt: number = 1) {
+    const received = await request("GET", URL, {}, logger);
+    let { status, data } = received;
+    console.log(status)
+    if(attempt >= 6) {
+        return undefined;
+    }
+    if(status != "ok") {
+        logger.error(`Api returned a non-successful response. Retry ${attempt}. URL: ${URL}.\nReceived: ${JSON.stringify(received)}`);
+        await new Promise(resolve => setTimeout(resolve, 10000))
+        return await checkStatus(URL, logger, ++attempt);
+    } else {
+        return data;
+    }
+}
+
 function searchString(transaction): string {
-    return `${transaction.transactionHash}-${transaction.blockNumber}-${transaction[`amountWise`]}`;
+    return `${transaction.transactionHash}-${transaction.blockNumber}-${transaction[`amount${token}`]}`;
 }
 
 async function searchFirstTransactionPage(apiUrl, toTimestamp, logger) {
@@ -83,15 +139,20 @@ async function searchTransactionPage(apiUrl, latest, toTimestamp, logger) {
     let page = await searchFirstTransactionPage(apiUrl, toTimestamp, logger);
     for(;;page--) {
         console.log(page);
-        const received = (await request("GET", url(apiUrl, page, limit, fromTimestamp, toTimestamp), {}, logger)).data;
-        const transactionHashes = received?.map(searchString);
+        const URL = url(apiUrl, page, limit, fromTimestamp, toTimestamp);
+        let data = await checkStatus(URL, logger);
+        if(!data) {
+            logger.error(`This page returned an invalid status, I skip it. URL: ${URL}`);
+            continue;
+        }
+        let transactionHashes = data.map(searchString);
         if(!transactionHashes) {
             return undefined;
         }
         if(~transactionHashes?.indexOf(searchString(latest))) {
             break;
         }
-        if(!received.length || page <= 0) {
+        if(!data.length || page <= 0) {
             console.error("Last post not found");
             logger.error("Last post not found");
             return undefined;
@@ -102,5 +163,5 @@ async function searchTransactionPage(apiUrl, latest, toTimestamp, logger) {
 }
 
 function url(apiUrl: string, page: number, limit: number, fromTimestamp: number, toTimestamp: number) {
-    return `${apiUrl}/staking/uniswap/feed?orderBy=ascending&type=any&page=${page}&limit=${limit}&fromTimestamp=${fromTimestamp}&toTimestamp=${toTimestamp}`;
+    return `${apiUrl}/staking/${stakingType}/feed?orderBy=ascending&type=any&page=${page}&limit=${limit}&fromTimestamp=${fromTimestamp}&toTimestamp=${toTimestamp}`;
 }

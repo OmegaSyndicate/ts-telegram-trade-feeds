@@ -17,9 +17,9 @@ interface IWorkers {
 
 let workers: {[key: string]: IWorkers} = {};
 
-function createWorker(token): Worker {
-    const worker = new Worker('./worker/index.js', { workerData: token, stdout: true })
-    const parserName = `parser-${token.token}-${token.type}`;
+function createWorker(token, key): Worker {
+    const worker = new Worker('./worker', { workerData: token, stdout: false })
+    const parserName = `parser-${key}`;
     worker.on('error', (err) => {
         logger.error(`${parserName}\n\n${err}`);
     });
@@ -32,26 +32,26 @@ function createWorker(token): Worker {
     return worker;
 }
 
-function workerKey(token, type) {
-    return `${token}-${type}`;
+function workerKey(token, type, stakingType?) {
+    return `${token}-${type}${stakingType ? `-${stakingType}` : ''}`;
 }
 
 config.tokens.forEach(token => {
-    const key = workerKey(token.token, token.type);
+    const key = workerKey(token.token, token.type, token?.stakingType);
     if(workers[key]) {
         console.error("Attention. Duplicate token found. Correct the config.")
-        // Logger
+        logger.error("Attention. Duplicate token found. Correct the config.")
     } else {
         token.kafkaSettings = config.kafkaSettings;
         delete token.publishers;
         workers[key] = {
-             worker: createWorker(token),
+             worker: createWorker(token, key),
              config: token,
              isRunning: false
         }
     }
 });
 
-
+console.log(workers);
 workerPoll(workers, logger);
 setInterval(workerPoll.bind(null, workers, logger), config.workerPoll * 1e3)

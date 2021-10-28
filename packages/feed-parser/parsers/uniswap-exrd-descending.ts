@@ -56,6 +56,7 @@ async function searchFirstTransactionPage(apiUrl, toTimestamp) {
     return maxPage;
 }
 
+
 async function searchTransactionPage(apiUrl, latest, toTimestamp) {
     let page = 0;
     for(;;page++) {
@@ -73,28 +74,28 @@ async function searchTransactionPage(apiUrl, latest, toTimestamp) {
     return page;
 }
 
-(async () => {
-    let latest = () => {
-        return { value: JSON.stringify({
-            feedType: "uniswapSell",
-            radixInUsd: 0.134866,
-            amountRadix: 2068,
-            amountRadixInUsd: 278.903818,
-            blockNumber: 13353460,
-            fromAddress: "0x54A80223E78C36ad29B4fb3b3F63E0FED917b29D",
-            toAddress: "0x6C2b384401F5aC765bfe6D128D785480f0FF2E71",
-            transactionHash: "0xa90c7bb9b3261375ebc4822d59ae6830a9e482bf8ac8b41b0f36f1b4c0d264b9",
-            netUsdBuys24Hours: 0,
-            netUsdBuysAvgDailyFor7Days: 0,
-            transactionFeeInEth: 0.084175602,
-            transactionFeeInUsd: 289.63141136160004
-        })}
-    }
-    let sss = sync(latest, { apiUrl: "https://api-exrd.wisetoken.me"});
-    for(let i = 0; i < 10; i++) {
-        console.log((await sss.next()).value)
-    }
-})()
+// (async () => {
+//     let latest = () => {
+//         return { value: JSON.stringify({
+//             feedType: "uniswapSell",
+//             radixInUsd: 0.134866,
+//             amountRadix: 2068,
+//             amountRadixInUsd: 278.903818,
+//             blockNumber: 13353460,
+//             fromAddress: "0x54A80223E78C36ad29B4fb3b3F63E0FED917b29D",
+//             toAddress: "0x6C2b384401F5aC765bfe6D128D785480f0FF2E71",
+//             transactionHash: "0xa90c7bb9b3261375ebc4822d59ae6830a9e482bf8ac8b41b0f36f1b4c0d264b9",
+//             netUsdBuys24Hours: 0,
+//             netUsdBuysAvgDailyFor7Days: 0,
+//             transactionFeeInEth: 0.084175602,
+//             transactionFeeInUsd: 289.63141136160004
+//         })}
+//     }
+//     let sss = sync(latest, { apiUrl: "https://api-exrd.wisetoken.me"});
+//     for(let i = 0; i < 10; i++) {
+//         console.log((await sss.next()).value)
+//     }
+// })()
 
 function url(apiUrl: string, page: number, limit: number, fromTimestamp: number, toTimestamp: number) {
     return `${apiUrl}/staking/uniswap/feed?orderBy=descending&type=any&page=${page}&limit=${limit}&fromTimestamp=${fromTimestamp}&toTimestamp=${toTimestamp}`;

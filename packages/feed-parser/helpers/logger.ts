@@ -11,9 +11,9 @@ export class Logger {
         return this.sendMessage([`Log at ${Date()} from ${this.info}\n${message}`]);
     }
     warn(message: string) {
-        return this.sendMessage([`Warn at ${Date()} from ${this.info}\n${message}`]);
+        return this.sendMessage([`Warn at ${Date()} from ${this.info}\n${message}\n\nStack trace: ${new Error().stack}`]);
     }
     error(message: string) {
-        return this.sendMessage([`Error at ${Date()} from ${this.info}\n${message}`]);
+        return this.sendMessage([`Error at ${Date()} from ${this.info}\n${message}\n\nStack trace: ${new Error().stack}`]);
     }
 }

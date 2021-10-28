@@ -2,7 +2,7 @@ import { workerData, parentPort } from 'worker_threads';
 import { producerService } from '../helpers/kafkaServices/producerService'
 import { Logger } from '../helpers/logger';
 
-const topic = `${workerData.token}-${workerData.type}`;
+const topic = `${workerData.token}-${workerData.type}${workerData.stakingType ? `-${workerData.stakingType}` : ''}`;
 const workerInfo = `parser-${topic}`;
 
 const logProducer = new producerService("logs", `logger-${workerInfo}`, workerData.kafkaSettings);
