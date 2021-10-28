@@ -19,7 +19,7 @@ interface IWorkers {
 let publishers: {[key: string]: IWorkers} = {};
 
 function createPublisher(publisher, type): Worker {
-    const worker = new Worker(`./workers/${type}.worker.js`, { workerData: publisher, stdout: true })
+    const worker = new Worker(`./workers/${type}.worker`, { workerData: publisher, stdout: false })
     const publisherName = `publisher-${publisher.topic}-${publisher.channel}`;
     worker.on('error', (err) => {
         logger.error(`${publisherName} in file ${type}\n\n${err}`);
@@ -30,8 +30,8 @@ function createPublisher(publisher, type): Worker {
     return worker;
 }
 
-function publisherKey({ token, type, channel }) {
-    return `${token}-${type}-${channel}`;
+function publisherKey({ token, type, channel, stakingType }) {
+    return `${token}-${type}-${channel}${stakingType ? `-${stakingType}` : ''}`;
 }
 
 synchronizeParallelPublishers();
@@ -41,6 +41,7 @@ config.tokens.forEach(token => {
         publisher.kafkaSettings = config.kafkaSettings;
         publisher.token = token.token;
         publisher.type = token.type;
+        publisher.stakingType = token?.stakingType;
         const key = publisherKey(publisher);
         if(publishers[key]) {
             console.error("Attention. Duplicate token found. Correct the config.")
@@ -96,7 +97,6 @@ function synchronizeParallelPublishers() {
         })
     })
 }
-
 
 workerPoll(publishers, logger);
 setInterval(workerPoll.bind(null, publishers, logger), config.workerPoll * 1e3)

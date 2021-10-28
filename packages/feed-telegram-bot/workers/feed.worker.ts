@@ -3,9 +3,11 @@ import { consumerService } from '../helpers/kafkaServices/consumerService';
 import { telegramBot } from '../helpers/telegramBot';
 import { Logger } from '../../feed-parser/helpers/logger';
 import { producerService } from '../../feed-parser/helpers/kafkaServices/producerService';
+import { createImportSpecifier } from 'typescript';
 // import { Logger } from '../helpers/logger';
 
-const topic = `${workerData.token}-${workerData.type}`;
+const topic = `${workerData.token}-${workerData.type}${workerData.stakingType ? `-${workerData.stakingType}` : ''}`;
+console.log("TOPIC", topic);
 const workerInfo = `publisher-${topic}-${workerData.channel}`;
 const logProducer = new producerService("logs", `logger-${workerInfo}`, workerData.kafkaSettings);
 const logger = new Logger(workerInfo, logProducer.sendMessages.bind(logProducer))
@@ -19,10 +21,10 @@ async function publish(workerData, message: Buffer) {
         const { parser } = await import(`../messageParsers/${workerData.parser ? workerData.parser : workerData.type}`);
         const { createMessage } = await import(`../messageCreators/${workerData.messageCreator ? workerData.messageCreator : workerData.type}`);
         const { validate } = await import(`../validators/${workerData.validator ? workerData.validator : workerData.type}`);
-        const parsedMessage = await parser(message);
-        if(await validate(workerData, parsedMessage)) {
+        const parsedMessage = await parser(message, logger);
+        if(await validate(workerData, parsedMessage, logger)) {
             stats++;
-            return await createMessage(parsedMessage, workerData);
+            return await createMessage(parsedMessage, workerData, logger);
         } else {
             return false;
         }
@@ -31,6 +33,8 @@ async function publish(workerData, message: Buffer) {
         logger.error(err);
     }
 }
+
+
 
 consumer.processMessages(publish.bind(null, workerData), bot.sendMessage.bind(bot), workerData.syncOffsetTime, workerData.withSync);
 
