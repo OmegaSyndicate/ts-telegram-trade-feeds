@@ -18,7 +18,7 @@ interface IWorkers {
 let workers: {[key: string]: IWorkers} = {};
 
 function createWorker(token, key): Worker {
-    const worker = new Worker('./worker', { workerData: token, stdout: false })
+    const worker = new Worker('./worker', { workerData: token, stdout: true })
     const parserName = `parser-${key}`;
     worker.on('error', (err) => {
         logger.error(`${parserName}\n\n${err}`);
@@ -52,6 +52,5 @@ config.tokens.forEach(token => {
     }
 });
 
-console.log(workers);
 workerPoll(workers, logger);
 setInterval(workerPoll.bind(null, workers, logger), config.workerPoll * 1e3)
