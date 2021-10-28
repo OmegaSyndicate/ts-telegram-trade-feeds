@@ -1,5 +1,4 @@
-
-import { numWithCommas, generateDots } from "./uniswap-exrd-ascending"
+import { numWithCommas, generateDots } from "./Radix-uniswap"
 
 export interface Message {
     sequence: number;

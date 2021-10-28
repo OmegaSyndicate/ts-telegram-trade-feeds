@@ -9,10 +9,11 @@ interface IMessage {
 }
 
 interface IConfig {
+    token: string;
     minUSD: number;
     // Expand to other meanings here
 }
 
 export function validate(config: IConfig, message: IMessage): Boolean {
-    return config.minUSD <= message.amountRadixInUsd;
+    return config.minUSD <= message[`amount${config.token}InUsd`];;
 }

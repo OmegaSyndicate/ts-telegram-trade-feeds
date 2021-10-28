@@ -1,4 +1,4 @@
-import { numWithCommas, generateDots, shortenAddress, createEtherscanLink } from "./uniswap-exrd-ascending"
+import { numWithCommas, generateDots, shortenAddress, createEtherscanLink } from "./Radix-uniswap"
 
 export interface Message {
     type?: "Bought" | "Sold",

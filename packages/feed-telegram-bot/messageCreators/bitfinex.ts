@@ -18,7 +18,7 @@
 //     amount: number;
 // }
 
-import { numWithCommas, generateDots } from "./uniswap-exrd-ascending"
+import { numWithCommas, generateDots } from "./Radix-uniswap"
 
 export interface Message {
     type: "Bought" | "Sold";
