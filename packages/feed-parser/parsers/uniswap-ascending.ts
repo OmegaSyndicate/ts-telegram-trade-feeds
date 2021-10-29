@@ -47,6 +47,9 @@ export async function* sync(latestMessage, settings, logger) {
                 if(!received) {
                     logger.error(`This page returned an invalid status, I skip it. URL: ${URL}`);
                     page++;
+                } else if(!received.length) {
+                    searchedPage = page = await searchTransactionPage(settings.apiUrl, latestObject, toTimestamp, logger);
+                    continue;
                 }
                 const transactionHashes = received?.map(searchString);
                 const offset = transactionHashes?.indexOf(searchString(latestObject)) + 1;
