@@ -50,7 +50,7 @@ export async function* sync(latestMessage, settings, logger) {
                 }
                 const transactionHashes = received?.map(searchString);
                 const offset = transactionHashes?.indexOf(searchString(latestObject)) + 1;
-                if(!offset || searchedPage == undefined || !transactionHashes || !received || !latestObject) {
+                if(offset == undefined || searchedPage == undefined || !transactionHashes || !received || !latestObject) {
                     throw new Error('Error in sync. One of the variables is empty.\n'
                     + `offset: ${offset}\ntransactionHashes:\n${JSON.stringify(transactionHashes)}\n\nreceived:\n${JSON.stringify(received)}\n\nlatestObject:\n${JSON.stringify(latestObject)}`);
                 }
