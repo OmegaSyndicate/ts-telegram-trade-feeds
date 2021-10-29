@@ -1,4 +1,4 @@
-import { numWithCommas, shortenAddress, createEtherscanLink, generateDots } from './Radix-uniswap';
+import { numWithCommas, shortenAddress, createEtherscanLink } from './Radix-uniswap';
 
 export interface Message {
     feedType: string,
@@ -10,6 +10,15 @@ export interface Message {
     transactionFeeInUsd: number,
     fromAddress: string,
     transactionHash: string
+}
+
+export function generateDots(options: Message | any, constants) {
+    var dots = options.amountWiseInUsd < 2*constants.USDInterval? 1: options.amountWiseInUsd / constants.USDInterval - 1;
+    dots = dots > 1000 ? 1000 : dots;
+    let message = "";
+    for (let i = 0; i < dots; i++)
+        message += (options.feedType == "uniswapBuy" ? "🟢" : "🔴");
+    return message;
 }
 
 export function createMessage(options: Message, constants={USDInterval: 500, uniswapPair: "0x684b00a5773679f88598a19976fbeb25a68e9a5f"}) {
