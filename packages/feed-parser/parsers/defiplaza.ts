@@ -3,6 +3,8 @@ import { request } from '../helpers/request';
 const apiUrl = 'https://api.thegraph.com/subgraphs/name/omegasyndicate/defiplaza';
 
 export async function* sync(latestMessage, settings, logger) {
+    let latestSaved;
+    let data;
     try {
         let token = await getToken(settings.token, logger);
         if(!token) {
@@ -10,17 +12,30 @@ export async function* sync(latestMessage, settings, logger) {
         }
         while(true) {
             const latest = (await latestMessage())?.value;
-            yield (await makeRequest(token, logger, latest)).map(t => JSON.stringify(t));
+            latestSaved = latest ? String(latest) : latestSaved;
+            console.log("LatestSaved", latestSaved);
+            if(!latest && latestSaved) {
+                logger.error("The received last saved transaction from kafka does not match the one saved in the current instance.\n" +
+                            `Received from kafka: ${String(latest)}\nLatest saved: ${String(latestSaved)}\nAn exception will be thrown after 1 minute.`);
+                await new Promise((resolve) => setTimeout(resolve, 60000));
+                throw new Error("The received last saved transaction from kafka does not match the one saved in the current instance.");
+            }
+            console.log("Latest", String(latest));
+            yield data = (await makeRequest(token, logger, latestSaved, latest)).map(t => JSON.stringify(t));
+            if(data.length) {
+                latestSaved = JSON.stringify(data.slice(-1));
+            }
         }
     } catch(err) {
         logger.error(err);
+        console.error(err);
         yield undefined;
     }
 }
 
 async function getToken(symbol, logger) {
     let token = await request("POST", apiUrl, { query: `query {
-        tokens(orderBy: swapCount, orderDirection: desc, where: {symbol: "eXRD"}) {
+        tokens(orderBy: swapCount, orderDirection: desc, where: {symbol: "${symbol}"}) {
           id
           symbol
           tokenAmount
@@ -30,7 +45,7 @@ async function getToken(symbol, logger) {
     return token.data.tokens[0].id;
 }
 
-async function makeRequest(token, logger, latest?) {
+async function makeRequest(token, logger, latestSaved, latest?) {
     let received: receivedType = {
         buy: [],
         sold: []
@@ -51,7 +66,7 @@ async function makeRequest(token, logger, latest?) {
                 amount = tempReceived.data.swaps.length;
             }
         }
-        return mergeTransactions(received);
+        return mergeTransactions(received, latestSaved);
     } else {
         const lastObject = JSON.parse(String(latest));
         let found: number = 0; // 0 or timestamp
@@ -102,7 +117,7 @@ async function makeRequest(token, logger, latest?) {
                 type = -1;
             }
         }
-        return mergeTransactions(received).filter(t => Number(t.timestamp) > found);
+        return mergeTransactions(received, latestSaved).filter(t => Number(t.timestamp) > found);
     }
 }
 
@@ -115,7 +130,7 @@ function searchString(transaction) {
     return `${transaction.id}-${transaction.timestamp}`;
 }
 
-function mergeTransactions(received: receivedType) {
+function mergeTransactions(received: receivedType, latestSaved) {
     let i, j;
     i = j = 0;
     let n = received.buy.length;
@@ -133,6 +148,17 @@ function mergeTransactions(received: receivedType) {
     }
     while (j < m) {
         result.push(received.sold[j++]);
+    }
+    if(latestSaved) {
+        const latestTHash = JSON.parse(latestSaved).id;
+        result.forEach((transaction) => {
+            if(transaction.id == latestTHash) {
+                throw new Error("Duplicate transaction found during merge.\n"
+                                + `latestSaved: ${latestSaved}`
+                                + `received: ${JSON.stringify(received)}`
+                                + `with merge: ${JSON.stringify(result)}`);
+            }
+        })
     }
     return result;
 }
