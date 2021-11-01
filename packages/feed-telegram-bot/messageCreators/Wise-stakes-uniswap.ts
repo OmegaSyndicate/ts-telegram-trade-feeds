@@ -21,8 +21,8 @@ export interface Message {
     closeDay?: number
 }
 
-export function generateDots(options: Message | any, constants, boundEmoji) {
-    var dots = options.amountWiseInUsd < 2*constants.USDInterval? 1: options.amountWiseInUsd / constants.USDInterval - 1;
+export function generateDots(amountInUsd, constants, boundEmoji) {
+    var dots = amountInUsd < 2*constants.USDInterval? 1: amountInUsd / constants.USDInterval - 1;
     dots = dots > 1000 ? 1000 : dots;
     let message = "";
     for (let i = 0; i < dots; i++)
@@ -48,7 +48,7 @@ export function createMessage(options: Message, constants, logger: Logger) {
         case "stakeCompleted":
             emoji = "📗"
             boundEmoji = "🟠"
-            additionalInfo = `💰 Reward: ${Math.ceil(options.rewardAmount)} WISE ($${Math.ceil(options.rewardAmountInUsd)})\n`
+            additionalInfo = `💰 Reward: ${numWithCommas(Math.ceil(options.rewardAmount))} WISE ($${numWithCommas(Math.ceil(options.rewardAmountInUsd))})\n`
                            + `📉 ROI: ${ROI}%\n\n`;
             days = options.closeDay - options.startDay + 1;
             break;
@@ -62,7 +62,7 @@ export function createMessage(options: Message, constants, logger: Logger) {
             throw 'error no bid';
     }
      return `${emoji} ${stakeType} of *${numWithCommas(Math.floor(options.amountWise * 1000) / 1000)} WISE* (${numWithCommas(Math.floor(options.amountWiseInUsd))}$) ${options.feedType == "stakeStarted" ? "for" : "after"} ${days} days ${options.feedType == "stakeCanceled" ? "long stake " : ''}on Uniswap (Gas Fee: $${numWithCommas(Math.ceil(options.transactionFeeInUsd))})\n\n` +
-            `${generateDots(options, constants, boundEmoji)}\n\n` +
+            `${generateDots(options.amountWiseInUsd, constants, boundEmoji)}\n\n` +
             additionalInfo +
             `From address: [${shortenAddress(options.fromAddress)}](${createEtherscanLink("address", options.fromAddress)})\n\n` +
             `📶 [Tx Hash](${createEtherscanLink("tx", options.transactionHash)}) | ℹ️ [Info](https://telegra.ph/Valar-List-of-informational-bots-03-23)`
