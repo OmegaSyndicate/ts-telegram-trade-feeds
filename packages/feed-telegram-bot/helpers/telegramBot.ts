@@ -15,7 +15,6 @@ export class telegramBot {
     }
     async sendMessage(message: string) {
         if(!message) return;
-        await new Promise(resolve => setTimeout(resolve, 3100 * this.amountPubs));
         try {
             if(message.length > 4096) { // Telegram limitation on message length
                 let parts = message.length / 4096;
@@ -27,9 +26,15 @@ export class telegramBot {
                 await this.bot.sendMessage(this.channel, message, {parse_mode: this.markdownEnable ?  "markdown" : undefined, disable_web_page_preview: true})
             }
         } catch(err) {
-            this.logger.error(err);
-            console.error(err);
-            return new Error("The message was not sent");
+            if(err.response.statusCode == 429) { // Too many requests(We went beyond the telegram limit)
+                console.log(err.response.body.parameters.retry_after);
+                await new Promise((resolve) => setTimeout(resolve, err.response.body.parameters.retry_after * 1e3));
+                await this.bot.sendMessage(this.channel, message, {parse_mode: this.markdownEnable ?  "markdown" : undefined, disable_web_page_preview: true}); // retry
+            } else {
+                this.logger.error(err);
+                console.error(err);
+                return new Error("The message was not sent");
+            }
         }
         return 0;
     }
