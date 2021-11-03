@@ -20,6 +20,7 @@ export class consumerService {
             autoCommitThreshold: 1,
             eachMessage: async({ topic, partition, message }) => {
                 if(firstStart && syncOffset) {
+                    firstStart = false;
                     await new Promise(resolve => setTimeout(resolve, syncOffset * 3000));
                 }
                 let status 
