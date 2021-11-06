@@ -36,24 +36,26 @@ function publisherKey({ token, type, channel, stakingType }) {
 
 synchronizeParallelPublishers();
 config.tokens.forEach(token => {
-    token.publishers.forEach((publisher: any) => {
-        publisher.botToken = config.botToken;
-        publisher.kafkaSettings = config.kafkaSettings;
-        publisher.token = token.token;
-        publisher.type = token.type;
-        publisher.stakingType = token?.stakingType;
-        const key = publisherKey(publisher);
-        if(publishers[key]) {
-            console.error("Attention. Duplicate token found. Correct the config.")
-            // Logger
-        } else {
-            publishers[key] = {
-                worker: createPublisher(publisher, "feed"),
-                config: publisher,
-                isRunning: false
+    if(token.publishers && token.publishers instanceof Array) {
+        token.publishers.forEach((publisher: any) => {
+            publisher.botToken = config.botToken;
+            publisher.kafkaSettings = config.kafkaSettings;
+            publisher.token = token.token;
+            publisher.type = token.type;
+            publisher.stakingType = token?.stakingType;
+            const key = publisherKey(publisher);
+            if(publishers[key]) {
+                console.error("Attention. Duplicate token found. Correct the config.")
+                // Logger
+            } else {
+                publishers[key] = {
+                    worker: createPublisher(publisher, "feed"),
+                    config: publisher,
+                    isRunning: false
+                }
             }
-        }
-    });
+        });
+    }
 });
 
 
@@ -76,15 +78,17 @@ function createLogger() {
 
 createLogger()
 
-function synchronizeParallelPublishers() {
+function synchronizeParallelPublishers(): void {
     let publishers: { [channel: string]: { tokenIndex: number, publisherIndex: number }[] } = {};
     config.tokens.forEach((token, tokenIndex) => {
-        token.publishers.forEach((publisher, publisherIndex) => {
-            if(!publishers[publisher.channel]) {
-                publishers[publisher.channel] = [];
-            }
-            publishers[publisher.channel].push({ tokenIndex, publisherIndex });
-        });
+        if(token.publishers && token.publishers instanceof Array) {
+            token.publishers.forEach((publisher, publisherIndex) => {
+                if(!publishers[publisher.channel]) {
+                    publishers[publisher.channel] = [];
+                }
+                publishers[publisher.channel].push({ tokenIndex, publisherIndex });
+            });
+        }
     });
     Object.keys(publishers).forEach(function (publisherChannel) {
         let publisherList = publishers[publisherChannel];
