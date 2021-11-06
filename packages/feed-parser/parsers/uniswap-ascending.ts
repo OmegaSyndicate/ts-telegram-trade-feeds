@@ -39,6 +39,9 @@ export async function* sync(latestMessage, settings, logger) {
                 let searchedPage;
                 if(!page) {
                     searchedPage = page = await searchTransactionPage(settings.apiUrl, latestObject, toTimestamp, logger);
+                    if(page == undefined) {
+                        throw `searchTransactionPage returned undefined`;
+                    }
                 } else {
                     searchedPage = page;
                 }
@@ -48,25 +51,27 @@ export async function* sync(latestMessage, settings, logger) {
                     logger.error(`This page returned an invalid status, I skip it. URL: ${URL}`);
                     page++;
                 } else if(!received.length) {
-                    searchedPage = page = await searchTransactionPage(settings.apiUrl, latestObject, toTimestamp, logger);
+                    searchedPage = page = undefined;
                     continue;
                 }
                 const transactionHashes = received?.map(searchString);
-                const offset = transactionHashes?.indexOf(searchString(latestObject)) + 1;
+                let offset = transactionHashes?.indexOf(searchString(latestObject)) + 1;
                 if(offset == undefined || searchedPage == undefined || !transactionHashes || !received || !latestObject) {
                     throw new Error('Error in sync. One of the variables is empty.\n'
                     + `offset: ${offset}\ntransactionHashes:\n${JSON.stringify(transactionHashes)}\n\nreceived:\n${JSON.stringify(received)}\n\nlatestObject:\n${JSON.stringify(latestObject)}`);
                 }
-                console.log(
-                    "latestObject", latestObject,
-                    "searchedPage", searchedPage,
-                    "received", received?.length,
-                    "offset", offset
-                )
                 do {
+                    console.log(
+                        "latestObject", latestObject,
+                        "searchedPage", searchedPage,
+                        "received", received?.length,
+                        "offset", offset,
+                        "page", page
+                    )
                     if(searchedPage == page) {
                         yield data = received?.slice(offset)?.map(transaction => JSON.stringify(transaction));
                     } else {
+                        offset = 0;
                         URL = url(settings.apiUrl, page, limit, fromTimestamp, toTimestamp);
                         data = await checkStatus(URL, logger);
                         if(!data) {
@@ -106,7 +111,7 @@ async function checkStatus(URL: string, logger, attempt: number = 1) {
     if(attempt >= 6) {
         return undefined;
     }
-    if(status != "ok") {
+    if(status != "ok" || !(data instanceof Array) || !data) {
         logger.error(`Api returned a non-successful response. Retry ${attempt}. URL: ${URL}.\nReceived: ${JSON.stringify(received)}`);
         await new Promise(resolve => setTimeout(resolve, 10000))
         return await checkStatus(URL, logger, ++attempt);
@@ -123,7 +128,8 @@ async function searchFirstTransactionPage(apiUrl, toTimestamp, logger) {
     let maxPage = 0;
     let maxStep = 100;
     while(true) {
-        const received = (await request("GET", url(apiUrl, maxPage + maxStep, limit, fromTimestamp, toTimestamp), {}, logger)).data;
+        const URL = url(apiUrl, maxPage + maxStep, limit, fromTimestamp, toTimestamp);
+        const received = await checkStatus(URL, logger);
         if(received?.length) {
             maxPage += maxStep;
         } else if(maxStep == 1) {
