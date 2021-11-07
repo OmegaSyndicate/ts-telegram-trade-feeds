@@ -71,8 +71,8 @@ async function makeRequest(token, logger, latestSaved, latest?) {
         const lastObject = JSON.parse(String(latest));
         let found: number = 0; // 0 or timestamp
         let amounts: searchType = {
-            buy: 10,
-            sold: 10
+            buy: 1000,
+            sold: 1000
         };
         let offsets: searchType = {
             buy: 0,
