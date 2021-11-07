@@ -1,8 +1,5 @@
 import { Message } from '../messageCreators/DEFT-staking';
 
 export function validate(config, msg: Message): boolean {
-    if(config.fromTimestamp) {
-        return config.fromTimestamp < Number(msg.timestamp);
-    }
-    return true;
+    return (Number(+msg.stakedAmount * +msg.deftInUsd) >= config.minUsd) && (config.fromTimestamp < Number(msg.timestamp));
 }
