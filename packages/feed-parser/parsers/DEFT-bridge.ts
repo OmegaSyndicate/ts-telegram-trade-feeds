@@ -42,9 +42,10 @@ async function searchBridges(settings, price, logger, latestSaved, latest) {
     }
     let data = [];
     while(true) {
-        let Burnimestamp = { index: 0, timestamp: Number(bridges[0].Mint[0]?.timestamp)};
-        for(let i = 1; i < bridges.length; i++) {
-            if(bridges[i].Mint.length && Number(bridges[i].Mint[0].timestamp) < Burnimestamp.timestamp) {
+        let Burnimestamp = { index: -1, timestamp: 0};
+        // console.log("BRIDGES", bridges);
+        for(let i = 0; i < bridges.length; i++) {
+            if(bridges[i].Mint.length && (Number(bridges[i].Mint[0].timestamp) < Burnimestamp.timestamp || Burnimestamp.timestamp == 0)) {
                 Burnimestamp = {
                     index: i,
                     timestamp: Number(bridges[i].Mint[0].timestamp)
@@ -92,6 +93,7 @@ async function searchBridges(settings, price, logger, latestSaved, latest) {
             break;
         }
     }
+    console.log(bridges);
     return data;
 }
 
@@ -110,10 +112,10 @@ async function makeRequest(apiUrl, logger, latestSaved, latest?) {
         return received;
     } else {
         const lastObject = JSON.parse(String(latest));
-        console.log("Last object", lastObject);
+        // console.log("Last object", lastObject);
         let data = [];
         for(let amount = 1000, offset = 0; amount >= 1000; offset += amount) {
-            let tempReceived = await request("POST", apiUrl, { query: createBridgeQuery(1000, 0, lastObject.timestamp) }, logger);
+            let tempReceived = await request("POST", apiUrl, { query: createBridgeQuery(1000, 0, lastObject.Burn.timestamp) }, logger);
             if(tempReceived['errors']) {
                 logger.error(tempReceived.errors);
                 return;
