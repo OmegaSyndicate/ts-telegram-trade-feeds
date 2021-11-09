@@ -19,7 +19,6 @@ interface Type {
 }
 
 export function createMessage(options: Message, constants) {
-    options.price = "0.00003205";
     let link;
     switch(options.Mint.symbol) {
         case "BSC":
