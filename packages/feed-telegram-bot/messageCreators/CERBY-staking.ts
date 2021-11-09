@@ -41,14 +41,14 @@ export async function createMessage(options: Message, constants, logger) {
         case "stakeCanceled":
             emoji = "📕";
             boundEmoji = "⚫️"
-            additionalInfo = `🚫 Penalty: ${numWithCommas(Math.ceil(+options.penalty))} DEFT (${numWithCommas(Math.ceil((Math.abs(options.rewardAmount) * +options.deftInUsd) * 1e3) / 1e3)}$)\n`
+            additionalInfo = `🚫 Penalty: ${numWithCommas(Math.ceil(+options.penalty))} CERBY (${numWithCommas(Math.ceil((Math.abs(options.rewardAmount) * +options.deftInUsd) * 1e3) / 1e3)}$)\n`
                            + `📉 ROI: ${options.roi}%\n\n`;
             days = +options.endDay - +options.startDay + 1
             break;
         case "stakeCompleted":
             emoji = "📗"
             boundEmoji = "🟠"
-            additionalInfo = `${options.rewardAmount > 0 ? '💰 Reward' : '🚫 Penalty'}: ${numWithCommas(Math.ceil(Math.abs(options.rewardAmount)))} DEFT (${numWithCommas(Math.ceil((Math.abs(options.rewardAmount) * +options.deftInUsd) * 1e3) / 1e3)}$)\n` +
+            additionalInfo = `${options.rewardAmount > 0 ? '💰 Reward' : '🚫 Penalty'}: ${numWithCommas(Math.ceil(Math.abs(options.rewardAmount)))} CERBY (${numWithCommas(Math.ceil((Math.abs(options.rewardAmount) * +options.deftInUsd) * 1e3) / 1e3)}$)\n` +
                              `📉 ROI: ${Math.ceil(+options.roi * 1000) / 1000}%\n\n`;
             days = +options.endDay - +options.startDay + 1;
             break;
@@ -61,9 +61,9 @@ export async function createMessage(options: Message, constants, logger) {
             logger.error(`No bid found.\nReceived data: ${JSON.stringify(options)}`)
             throw 'error no bid';
     }
-     return `${emoji} ${stakeType} of *${numWithCommas(Math.floor(+options.stakedAmount * 1000) / 1000)} DEFT* (${numWithCommas(Math.floor(+options.stakedAmount * +options.deftInUsd))}$) ${options.feedType == "stakeStarted" ? "for" : "after"} ${days} days ${options.feedType == "stakeCanceled" ? "long stake " : ''}on ${constants.token} (Gas Fee: $${numWithCommas(Math.ceil(options.transactionFeeInUsd))})\n\n` +
+     return `${emoji} ${stakeType} of *${numWithCommas(Math.floor(+options.stakedAmount * 1000) / 1000)} CERBY* (${numWithCommas(Math.floor(+options.stakedAmount * +options.deftInUsd))}$) ${options.feedType == "stakeStarted" ? "for" : "after"} ${days} days ${options.feedType == "stakeCanceled" ? "long stake " : ''}on ${constants.token} (Gas Fee: $${numWithCommas(Math.ceil(options.transactionFeeInUsd))})\n\n` +
             `${generateDots(+options.stakedAmount * +options.deftInUsd, constants, boundEmoji)}\n\n` +
             additionalInfo +
             `From address: [${shortenAddress(options.owner.id)}](${createEtherscanLink("address", options.owner.id)})\n\n` +
-            `🥩 [Staking](https://app.defifactory.fi/staking) | 📶 [Tx Hash](${constants.scanURL}${options.feedType == "stakeStarted" ? options.startTx : options.endTx}) | ℹ️ [Info](https://telegra.ph/Valar-List-of-informational-bots-03-23)`
+            `🥩 [Staking](https://app.cerby.fi/staking) | 📶 [Tx Hash](${constants.scanURL}${options.feedType == "stakeStarted" ? options.startTx : options.endTx}) | ℹ️ [Info](https://telegra.ph/Valar-List-of-informational-bots-03-23)`
 }

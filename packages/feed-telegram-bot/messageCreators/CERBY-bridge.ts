@@ -32,8 +32,8 @@ export function createMessage(options: Message, constants) {
             link = `https://polygonscan.com/tx/${options.Mint.txHash}`;
             break;
     }
-    return `🌉 Bridged *${numWithCommas((Number(options.Mint.amount) / 1e6).toFixed(3))} Million DEFT* ($${numWithCommas((Number(options.Mint.amount) * Number(options.price)).toFixed(2))}) from ${options.Burn.symbol} to ${options.Mint.symbol} chain\n` +
+    return `🌉 Bridged *${numWithCommas((Number(options.Mint.amount) / 1e6).toFixed(3))} Million CERBY* ($${numWithCommas((Number(options.Mint.amount) * Number(options.price)).toFixed(2))}) from ${options.Burn.symbol} to ${options.Mint.symbol} chain\n` +
         `From address: [${shortenAddress(options.Burn.sender)}](${createEtherscanLink("address", options.Mint.sender)})\n\n` +
         `${generateDots(Number(options.Mint.amount) * Number(options.price), constants, '🟠')}\n\n` +
-        `🌉 [Bridge](https://bridge.defifactory.fi) | 📶 [Tx Hash](${link})`;
+        `🌉 [Bridge](https://bridge.cerby.fi) | 📶 [Tx Hash](${link})`;
 }
