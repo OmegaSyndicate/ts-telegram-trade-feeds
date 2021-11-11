@@ -79,11 +79,8 @@ async function searchBridges(settings, price, logger, latestSaved, latest) {
                 bridges[i].Burn.splice(offset, 1);
                 break;
             }
-            if(i  == 2) {
-                console.log("Not founded", currentMintTransaction);
-            }
         }
-        if(currentMintTransaction) {
+        if(currentBurnTransaction) {
             data.push({
                 Burn: currentBurnTransaction,
                 Mint: currentMintTransaction,
