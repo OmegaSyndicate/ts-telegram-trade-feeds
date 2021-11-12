@@ -87,6 +87,7 @@ async function searchBridges(settings, price, logger, latestSaved, latest) {
                 ...price
             });
         } else {
+            console.error("Burn transaction isn't found", currentMintTransaction)
             break;
         }
     }
@@ -112,7 +113,7 @@ async function makeRequest(apiUrl, logger, latestSaved, latest?) {
         // console.log("Last object", lastObject);
         let data = [];
         for(let amount = 1000, offset = 0; amount >= 1000; offset += amount) {
-            let tempReceived = await request("POST", apiUrl, { query: createBridgeQuery(1000, 0, lastObject.Burn.timestamp) }, logger);
+            let tempReceived = await request("POST", apiUrl, { query: createBridgeQuery(1000, 0) }, logger);
             if(tempReceived['errors']) {
                 logger.error(tempReceived.errors);
                 return;
@@ -163,7 +164,7 @@ function createBridgeQuery(first = 1000, skip = 0, fromTimestamp = 0) {
             orderDirection: asc
             first: ${first},
             skip: ${skip},
-            where: {timestamp_gte: ${fromTimestamp}}
+            where: {timestamp_gte: ${+fromTimestamp - 100000}}
           ) {
             id
             type
