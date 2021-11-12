@@ -1,3 +1,4 @@
+import { isIfStatement } from "typescript";
 import { Logger } from "../../feed-parser/helpers/logger";
 import { numWithCommas, shortenAddress, createEtherscanLink } from './Radix-uniswap';
 
@@ -16,18 +17,36 @@ export interface Message {
     rewardAmount: number,
     rewardAmountInUsd: number,
     startDay: number,
+    startDate: string, // Date string
     lockDays: number,
     finalDay: number,
     closeDay?: number
 }
 
 export function generateDots(amountInUsd, constants, boundEmoji) {
-    var dots = amountInUsd < 2*constants.USDInterval? 1: amountInUsd / constants.USDInterval - 1;
+    let dots = amountInUsd < 2*constants.USDInterval? 1: amountInUsd / constants.USDInterval - 1;
     dots = dots > 1000 ? 1000 : dots;
     let message = "";
     for (let i = 0; i < dots; i++)
         message += boundEmoji;
     return message;
+}
+
+export function getDate(day: number, fromTimestamp: number | string = 0) {
+    let date_1 = new Date(fromTimestamp);
+    let date_2 = new Date(+date_1 + (day * 86400 * 1e3));
+    let date2_UTC = new Date(Date.UTC(date_2.getUTCFullYear(), date_2.getUTCMonth(), date_2.getUTCDate()));
+    let date1_UTC = new Date(Date.UTC(date_1.getUTCFullYear(), date_1.getUTCMonth(), date_1.getUTCDate()));
+
+    let days = (+date2_UTC - +date1_UTC) / (86400 * 1e3);
+    console.log(days);
+    if(Math.floor(days / 365)) {
+        return `(${(days / 365).toFixed(1)} years) `;
+    } else if(Math.floor(days / 30)) {
+        return `(${(days / 30).toFixed(1)} months) `;
+    } else {
+        return '';
+    }
 }
 
 export function createMessage(options: Message, constants, logger: Logger) {
@@ -61,7 +80,7 @@ export function createMessage(options: Message, constants, logger: Logger) {
             logger.error(`No bid found.\nReceived data: ${JSON.stringify(options)}`)
             throw 'error no bid';
     }
-     return `${emoji} ${stakeType} of *${numWithCommas(Math.floor(options.amountWise * 1000) / 1000)} WISE* (${numWithCommas(Math.floor(options.amountWiseInUsd))}$) ${options.feedType == "stakeStarted" ? "for" : "after"} ${days} days ${options.feedType == "stakeCanceled" ? "long stake " : ''}on Uniswap (Gas Fee: $${numWithCommas(Math.ceil(options.transactionFeeInUsd))})\n\n` +
+     return `${emoji} ${stakeType} of *${numWithCommas(Math.floor(options.amountWise * 1000) / 1000)} WISE* (${numWithCommas(Math.floor(options.amountWiseInUsd))}$) ${options.feedType == "stakeStarted" ? "for" : "after"} ${days} days ${getDate(days, options.startDate)}${options.feedType == "stakeCanceled" ? "long stake " : ''}on Uniswap (Gas Fee: $${numWithCommas(Math.ceil(options.transactionFeeInUsd))})\n\n` +
             `${generateDots(options.amountWiseInUsd, constants, boundEmoji)}\n\n` +
             additionalInfo +
             `From address: [${shortenAddress(options.fromAddress)}](${createEtherscanLink("address", options.fromAddress)})\n\n` +
