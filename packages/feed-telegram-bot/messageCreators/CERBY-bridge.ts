@@ -27,9 +27,11 @@ export function createMessage(options: Message, constants) {
         case "ETH":
             link = createEtherscanLink('tx', options.Mint.txHash);
             break;
-        case "POL":
+        case "Polygon":
             link = `https://polygonscan.com/tx/${options.Mint.txHash}`;
             break;
+        default:
+            throw "Error, symbol not found! "
     }
     return `🌉 Bridged *${numWithCommas((Number(options.Mint.amount) / 1e6).toFixed(3))} Million CERBY* ($${numWithCommas((Number(options.Mint.amount) * Number(options.price)).toFixed(2))}) from ${options.Burn.symbol} to ${options.Mint.symbol} chain\n` +
         `From address: [${shortenAddress(options.Burn.sender)}](${createEtherscanLink("address", options.Mint.sender)})\n\n` +
