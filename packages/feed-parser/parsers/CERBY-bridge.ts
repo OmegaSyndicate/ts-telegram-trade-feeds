@@ -122,11 +122,12 @@ async function makeRequest(apiUrl, logger, latestSaved, latest?) {
                 if(t.type == "Mint") {
                     return t.timestamp > lastObject.Mint.timestamp;
                 } else {
-                    return t.timestamp > lastObject.Burn.timestamp;
+                    return true
                 }
             })
+            console.log(tempReceived)
             const tempIds = tempReceived.data.proofs.map(searchString);
-            if(~tempIds.indexOf(searchString(lastObject.Mint)) || ~tempIds.indexOf(searchString(lastObject.Burn))) {
+            if(~tempIds.indexOf(searchString(lastObject.Mint))) {
                 await logger.error(`An attempt to insert a duplicate was detected, throwing an exception. Timestamp: ${lastObject.timestamp}`);
                 await logger.log(`Received: ${JSON.stringify(tempReceived.data.proofs)}`);
                 await logger.log(`LastObject: ${latestSaved}`)
