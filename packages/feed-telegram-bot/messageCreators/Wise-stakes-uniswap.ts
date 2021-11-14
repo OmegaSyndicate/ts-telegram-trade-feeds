@@ -80,7 +80,7 @@ export function createMessage(options: Message, constants, logger: Logger) {
             logger.error(`No bid found.\nReceived data: ${JSON.stringify(options)}`)
             throw 'error no bid';
     }
-     return `${emoji} ${stakeType} of *${numWithCommas(Math.floor(options.amountWise * 1000) / 1000)} WISE* (${numWithCommas(Math.floor(options.amountWiseInUsd))}$) ${options.feedType == "stakeStarted" ? "for" : "after"} ${days} days ${getDate(days, options.startDate)}${options.feedType == "stakeCanceled" ? "long stake " : ''}on Uniswap (Gas Fee: $${numWithCommas(Math.ceil(options.transactionFeeInUsd))})\n\n` +
+     return `${emoji} ${stakeType} of *${numWithCommas(Math.floor(options.amountWise * 1000) / 1000)} WISE* (${numWithCommas(Math.floor(options.amountWiseInUsd))}$) ${options.feedType == "stakeStarted" ? "for" : "after"} ${days} days ${getDate(days, options.startDate)}long (Gas Fee: $${numWithCommas(Math.ceil(options.transactionFeeInUsd))})\n\n` +
             `${generateDots(options.amountWiseInUsd, constants, boundEmoji)}\n\n` +
             additionalInfo +
             `From address: [${shortenAddress(options.fromAddress)}](${createEtherscanLink("address", options.fromAddress)})\n\n` +
