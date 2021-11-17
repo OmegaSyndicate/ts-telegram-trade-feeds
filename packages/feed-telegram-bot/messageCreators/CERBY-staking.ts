@@ -64,6 +64,6 @@ export async function createMessage(options: Message, constants, logger) {
      return `${emoji} ${stakeType} of *${numWithCommas(Math.floor(+options.stakedAmount * 1000) / 1000)} CERBY* (${numWithCommas(Math.floor(+options.stakedAmount * +options.deftInUsd))}$) ${options.feedType == "stakeStarted" ? "for" : "after"} ${days} days ${getDate(days, +options.timestamp * 1e3)}long on ${constants.token} (Gas Fee: $${numWithCommas(Math.ceil(options.transactionFeeInUsd))})\n\n` +
             `${generateDots(+options.stakedAmount * +options.deftInUsd, constants, boundEmoji)}\n\n` +
             additionalInfo +
-            `From address: [${shortenAddress(options.owner.id)}](${createEtherscanLink("address", options.owner.id)})\n\n` +
-            `🥩 [Staking](https://app.cerby.fi/staking) | 📶 [Tx Hash](${constants.scanURL}${options.feedType == "stakeStarted" ? options.startTx : options.endTx}) | ℹ️ [Info](https://telegra.ph/Valar-List-of-informational-bots-03-23)`
+            `From address: [${shortenAddress(options.owner.id)}](${constants.scanURL}address/${options.owner.id})\n\n` +
+            `🥩 [Staking](https://app.cerby.fi/staking) | 📶 [Tx Hash](${constants.scanURL}tx/${options.feedType == "stakeStarted" ? options.startTx : options.endTx}) | ℹ️ [Info](https://telegra.ph/Valar-List-of-informational-bots-03-23)`
 }
