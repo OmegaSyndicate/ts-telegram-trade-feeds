@@ -190,11 +190,12 @@
         {
             "token": "Polygon",
             "pair": "Matic",
+            "stakingTypes": ["started", "canceled", "completed"],
             "type": "CERBY-staking",
-            "apiURL": "http://nodes2.valar-solutions.com:8000/subgraphs/name/deft/staking-polygon",
+            "apiURL": "https://graph.cerby.fi/subgraphs/name/deft/staking-polygon",
             "jsonRpc": "https://secret:X4gDeGtfQy2M@polygon-node.valar-solutions.com",
-            "ETHpriceGraph": "http://nodes2.valar-solutions.com:8000/subgraphs/name/deft/deft-quickswap-v2",
-            "DEFTpriceGraph": "http://nodes2.valar-solutions.com:8000/subgraphs/name/deft/deft-quickswap-v2",
+            "ETHpriceGraph": "https://graph.cerby.fi/subgraphs/name/deft/deft-quickswap-v2",
+            "DEFTpriceGraph": "https://graph.cerby.fi/subgraphs/name/deft/deft-quickswap-v2",
             "synchronizeIntervalMs": 30000,
             "publishers": [
                 {
@@ -210,6 +211,7 @@
         {
             "token": "Binance",
             "pair": "Bnb",
+            "stakingTypes": ["started", "canceled", "completed"],
             "type": "CERBY-staking",
             "apiURL": "http://nodes2.valar-solutions.com:8000/subgraphs/name/deft/staking-binance",
             "jsonRpc": "https://secret:X4gDeGtfQy2M@bsc-node.valar-solutions.com",

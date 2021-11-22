@@ -19,7 +19,7 @@ export async function* sync(latestMessage, settings, logger) {
                 throw new Error("The received last saved transaction from kafka does not match the one saved in the current instance.");
             }
             console.log("Latest", String(latest));
-            yield data = (await normalization((await makeRequest(settings.apiURL, logger, latestSaved, latest)), settings)).map(t => JSON.stringify(t));
+            yield data = (await normalization((await makeRequest(settings.stakingType, settings.apiURL, logger, latestSaved, latest)), settings)).map(t => JSON.stringify(t));
             if(data.length) {
                 latestSaved = JSON.stringify(data.slice(-1));
             }
@@ -31,13 +31,13 @@ export async function* sync(latestMessage, settings, logger) {
     }
 }
 
-async function makeRequest(apiUrl, logger, latestSaved, latest?) {
+async function makeRequest(stakeType, apiUrl, logger, latestSaved, latest?) {
     let received = [];
     let data = [];
     console.log(apiUrl)
     if(!latest) {
         for(let amount = 1000, offset = 0; amount >= 1000; offset += amount) {
-            let tempReceived = await request("POST", apiUrl, { query: createBridgeQuery(1000, offset) }, logger);
+            let tempReceived = await request("POST", apiUrl, { query: createBridgeQuery(stakeType, 1000, offset) }, logger);
             if(tempReceived['errors']) {
                 logger.error(tempReceived.errors);
                 return;
@@ -49,7 +49,7 @@ async function makeRequest(apiUrl, logger, latestSaved, latest?) {
     } else {
         const lastObject = JSON.parse(String(latest));
         let lastString = searchString(lastObject);
-        let tempReceived = await request("POST", apiUrl, { query: createBridgeQuery(1000, 0, lastObject.timestamp) }, logger);
+        let tempReceived = await request("POST", apiUrl, { query: createBridgeQuery(stakeType, 1000, 0, lastObject.timestamp) }, logger);
         console.log(tempReceived)
         if(tempReceived['errors']) {
             logger.error(tempReceived.errors);
@@ -77,7 +77,7 @@ async function normalization(received, settings) {
         stake.transactionFeeInUsd = ((Number(stake.gasUsed) * Number(stake.gasPrice)) / 1e18) * +OtherPrice
         stake.otherInUsdPrice = OtherPrice;
         stake.deftInUsd = DEFTPrice;
-        if(+stake.endDay && +stake.endDay >= +stake.startDay + +stake.lockDays - 1) {
+        if(+stake.completedAt) {
             stake.feedType = "stakeCompleted";
             console.log('\n\n\n\nStakeCompleted\n\n\n\n')
             // let days = stake.endDay//BigInt((await createRPCRequest("getCurrentDay", {})).result);
@@ -169,9 +169,9 @@ function searchString(transaction) {
 }
 
 
-function createBridgeQuery(first = 1000, skip = 0, fromTimestamp = 0) {
+function createBridgeQuery(stakeType: string, first = 1000, skip = 0, fromTimestamp = 0) {
     return `query {
-        stakes(first: ${first}, skip: ${skip}, where: {timestamp_gte: ${fromTimestamp}},
+        stakes(first: ${first}, skip: ${skip}, where: {${stakeType}At_gte: ${fromTimestamp}},
             orderBy: timestamp, orderDirection: asc) {
             id
             owner {

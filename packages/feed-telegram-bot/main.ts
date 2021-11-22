@@ -34,7 +34,7 @@ function publisherKey({ token, type, channel, stakingType }) {
     return `${token}-${type}-${channel}${stakingType ? `-${stakingType}` : ''}`;
 }
 
-synchronizeParallelPublishers();
+// synchronizeParallelPublishers();
 config.tokens.forEach(token => {
     if(token.publishers && token.publishers instanceof Array) {
         token.publishers.forEach((publisher: any) => {
@@ -48,10 +48,22 @@ config.tokens.forEach(token => {
                 console.error("Attention. Duplicate token found. Correct the config.")
                 // Logger
             } else {
-                publishers[key] = {
-                    worker: createPublisher(publisher, "feed"),
-                    config: publisher,
-                    isRunning: false
+                if(token.stakingTypes && token.stakingTypes instanceof Array) {
+                    token.stakingTypes.forEach((stakingType) => {
+                        publisher.stakingType = stakingType; 
+                        const newKey = publisherKey(publisher);
+                        publishers[newKey] = {
+                            worker: createPublisher(publisher, "feed"),
+                            config: publisher,
+                            isRunning: false
+                        }
+                    })
+                } else {
+                    publishers[key] = {
+                        worker: createPublisher(publisher, "feed"),
+                        config: publisher,
+                        isRunning: false
+                    }
                 }
             }
         });
@@ -76,31 +88,31 @@ function createLogger() {
     }
 }
 
-createLogger()
+// createLogger()
 
-function synchronizeParallelPublishers(): void {
-    let publishers: { [channel: string]: { tokenIndex: number, publisherIndex: number }[] } = {};
-    config.tokens.forEach((token, tokenIndex) => {
-        if(token.publishers && token.publishers instanceof Array) {
-            token.publishers.forEach((publisher, publisherIndex) => {
-                if(!publishers[publisher.channel]) {
-                    publishers[publisher.channel] = [];
-                }
-                publishers[publisher.channel].push({ tokenIndex, publisherIndex });
-            });
-        }
-    });
-    Object.keys(publishers).forEach(function (publisherChannel) {
-        let publisherList = publishers[publisherChannel];
-        let syncAmountPubs = publisherList.length;
-        publisherList.forEach((publisher, syncOffsetTime) => {
-            let pub = config.tokens[publisher.tokenIndex]
-                  .publishers[publisher.publisherIndex];
-            config.tokens[publisher.tokenIndex]
-                .publishers[publisher.publisherIndex] = { ...pub, syncOffsetTime, syncAmountPubs };
-        })
-    })
-}
+// function synchronizeParallelPublishers(): void {
+//     let publishers: { [channel: string]: { tokenIndex: number, publisherIndex: number }[] } = {};
+//     config.tokens.forEach((token, tokenIndex) => {
+//         if(token.publishers && token.publishers instanceof Array) {
+//             token.publishers.forEach((publisher, publisherIndex) => {
+//                 if(!publishers[publisher.channel]) {
+//                     publishers[publisher.channel] = [];
+//                 }
+//                 publishers[publisher.channel].push({ tokenIndex, publisherIndex });
+//             });
+//         }
+//     });
+//     Object.keys(publishers).forEach(function (publisherChannel) {
+//         let publisherList = publishers[publisherChannel];
+//         let syncAmountPubs = publisherList.length;
+//         publisherList.forEach((publisher, syncOffsetTime) => {
+//             let pub = config.tokens[publisher.tokenIndex]
+//                   .publishers[publisher.publisherIndex];
+//             config.tokens[publisher.tokenIndex]
+//                 .publishers[publisher.publisherIndex] = { ...pub, syncOffsetTime, syncAmountPubs };
+//         })
+//     })
+// }
 
 workerPoll(publishers, logger);
 setInterval(workerPoll.bind(null, publishers, logger), config.workerPoll * 1e3)

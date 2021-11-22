@@ -44,10 +44,22 @@ config.tokens.forEach(token => {
     } else {
         token.kafkaSettings = config.kafkaSettings;
         delete token.publishers;
-        workers[key] = {
-             worker: createWorker(token, key),
-             config: token,
-             isRunning: false
+        if(token.stakingTypes && token.stakingTypes instanceof Array) {
+            token.stakingTypes.forEach((el) => {
+                token.stakingType = el;
+                const newKey = workerKey(token.token, token.type, token.stakingType);
+                workers[newKey] = {
+                    worker: createWorker(token, key),
+                    config: token,
+                    isRunning: false
+                }
+            })
+        } else {
+            workers[key] = {
+                worker: createWorker(token, key),
+                config: token,
+                isRunning: false
+            }
         }
     }
 });
