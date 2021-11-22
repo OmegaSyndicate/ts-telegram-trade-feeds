@@ -64,5 +64,5 @@ config.tokens.forEach(token => {
     }
 });
 
-workerPoll(workers, logger);
+setTimeout(workerPoll.bind(null, workers, logger), 3000);
 setInterval(workerPoll.bind(null, workers, logger), config.workerPoll * 1e3)

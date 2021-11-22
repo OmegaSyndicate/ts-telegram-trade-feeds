@@ -88,7 +88,7 @@ function createLogger() {
     }
 }
 
-// createLogger()
+createLogger()
 
 // function synchronizeParallelPublishers(): void {
 //     let publishers: { [channel: string]: { tokenIndex: number, publisherIndex: number }[] } = {};
@@ -114,5 +114,5 @@ function createLogger() {
 //     })
 // }
 
-workerPoll(publishers, logger);
+setTimeout(workerPoll.bind(null, publishers, logger), 3000);
 setInterval(workerPoll.bind(null, publishers, logger), config.workerPoll * 1e3)
