@@ -29,6 +29,13 @@ export class producerService {
             await transaction.commit();
         } catch(err) {
             await transaction.abort();
+            if(err.type == "MESSAGE_TOO_LARGE") {
+                for(let part = 0, size = Math.ceil(messages.length / 10); part < Math.ceil(messages.length / size);) {
+                    console.log(part, size, )
+                    await this.sendMessages(messages.slice(size * part, size * ++part));
+                }
+                this.logger?.log("This message was sent in chunks due to its large size.");
+            }
             this.logger?.error(err);
             return 1;
         }
@@ -46,6 +53,7 @@ export class producerService {
         await consumer.connect();
         await consumer.subscribe({ topic: this.topic, fromBeginning: false});
         let [{ high }] = await admin.fetchTopicOffsets(this.topic);
+        console.log(high);
         if(Number(high)) {
             await admin.setOffsets({
                 groupId,
