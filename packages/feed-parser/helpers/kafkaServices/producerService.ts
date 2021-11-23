@@ -48,7 +48,7 @@ export class producerService {
         let groupId = `consumer-get-latest-${uuidv4()}`;
         const consumer = this.kafka.consumer({ groupId });
         const admin = this.kafka.admin();
-        let latest_message;
+        let latest_message = null;
         await admin.connect();
         await consumer.connect();
         await consumer.subscribe({ topic: this.topic, fromBeginning: false});
@@ -66,7 +66,13 @@ export class producerService {
                 ]
             });
             await consumer.run({ eachMessage: async ({ topic, message }) => { latest_message = message }});
-            while(!latest_message) {
+            setTimeout(() => {
+                if(latest_message == null && +high < 5) {
+                    this.logger.error(`Topic: ${this.topic}. The last transaction was not received with offset = ${+high - 2}. Synchronization is being performed again due to an error.`);
+                    latest_message = undefined;
+                }
+            }, 60000);
+            while(latest_message != null) {
                 await new Promise(resolve => setTimeout(resolve, 15));
             }
         } else {
