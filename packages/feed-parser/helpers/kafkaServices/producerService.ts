@@ -72,7 +72,7 @@ export class producerService {
                     latest_message = undefined;
                 }
             }, 60000);
-            while(latest_message != null) {
+            while(latest_message == null) {
                 await new Promise(resolve => setTimeout(resolve, 15));
             }
         } else {
