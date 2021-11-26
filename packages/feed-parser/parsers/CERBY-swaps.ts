@@ -1,11 +1,15 @@
 import { request } from '../helpers/request';
 
 let token;
+let cerby = 'Deft';
 
 export async function* sync(latestMessage, settings, logger) {
     token = settings.pair;
     let latestSaved;
     let data;
+    if(settings.cerby) {
+        cerby = settings.cerby;
+    }
     try {
         while(true) {
             const latest = (await latestMessage())?.value;
@@ -37,6 +41,12 @@ async function normalization(received, settings) {
     let promises = received.map(async (swap) => {
         swap.transactionFeeInUsd = swap[`transactionFeeIn${settings.pair}`] * +OtherPrice
         swap.otherInUsdPrice = OtherPrice;
+        if(settings.cerby) {
+            swap.amountDeft = swap[`amount${settings.cerby}`];
+            swap.amountDeftInUsd = swap[`amount${settings.cerby}InUsd`];
+            delete swap[`amount${settings.cerby}`];
+            delete swap[`amount${settings.cerby}InUsd`];
+        }
         // swap.deftInUsd = DEFTPrice;
         return swap;
     });
@@ -102,9 +112,9 @@ function createBridgeQuery(first = 1000, skip = 0, fromTimestamp = 0) {
             to
             ` +
             //deftIn${token}
-            `amountDeft ` +
+            `amount${cerby} ` +
             //amountDeftIn${token}
-            `amountDeftInUsd
+            `amount${cerby}InUsd
             transactionFeeIn${token} ` +
             // transactionFeeInUsd
             `logIndex
