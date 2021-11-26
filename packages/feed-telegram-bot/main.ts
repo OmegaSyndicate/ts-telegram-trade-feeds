@@ -18,7 +18,10 @@ interface IWorkers {
 
 let publishers: {[key: string]: IWorkers} = {};
 
-function createPublisher(publisher, type): Worker {
+let workerNum = 1;
+let workerTimeoutStart = 10000; // 10 seconds
+async function createPublisher(publisher, type): Promise<Worker> {
+    await new Promise(resolve => setTimeout(resolve, workerTimeoutStart*workerNum++))
     const worker = new Worker(`./workers/${type}.worker`, { workerData: publisher, stdout: false })
     const publisherName = `publisher-${publisher.topic}-${publisher.channel}`;
     worker.on('error', (err) => {
@@ -37,7 +40,7 @@ function publisherKey({ token, type, channel, stakingType }) {
 // synchronizeParallelPublishers();
 config.tokens.forEach(token => {
     if(token.publishers && token.publishers instanceof Array) {
-        token.publishers.forEach((publisher: any) => {
+        token.publishers.forEach(async (publisher: any) => {
             publisher.botToken = config.botToken;
             publisher.kafkaSettings = config.kafkaSettings;
             publisher.token = token.token;
@@ -49,18 +52,18 @@ config.tokens.forEach(token => {
                 // Logger
             } else {
                 if(token.stakingTypes && token.stakingTypes instanceof Array) {
-                    token.stakingTypes.forEach((stakingType) => {
+                    token.stakingTypes.forEach(async (stakingType) => {
                         publisher.stakingType = stakingType; 
                         const newKey = publisherKey(publisher);
                         publishers[newKey] = {
-                            worker: createPublisher(publisher, "feed"),
+                            worker: await createPublisher(publisher, "feed"),
                             config: publisher,
                             isRunning: false
                         }
                     })
                 } else {
                     publishers[key] = {
-                        worker: createPublisher(publisher, "feed"),
+                        worker: await createPublisher(publisher, "feed"),
                         config: publisher,
                         isRunning: false
                     }
@@ -72,7 +75,7 @@ config.tokens.forEach(token => {
 
 
 // Logger
-function createLogger() {
+async function createLogger() {
     const logsPublisher = {
         botToken: config.botToken,
         channel: config.logsChat.channel,
@@ -82,7 +85,7 @@ function createLogger() {
         syncAmountPubs: 1
     }
     publishers['logs'] = {
-        worker: createPublisher(logsPublisher, "logger"),
+        worker: await createPublisher(logsPublisher, "logger"),
         config: logsPublisher,
         isRunning: false
     }
@@ -114,5 +117,5 @@ createLogger()
 //     })
 // }
 
-setTimeout(workerPoll.bind(null, publishers, logger), 3000);
+setTimeout(workerPoll.bind(null, publishers, logger), (workerNum + 1) * workerTimeoutStart);
 setInterval(workerPoll.bind(null, publishers, logger), config.workerPoll * 1e3)
