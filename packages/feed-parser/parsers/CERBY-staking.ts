@@ -2,11 +2,14 @@ import { request } from '../helpers/request';
 import * as URL from 'url';
 
 let rpcURL;
-
+let cerby = 'deft';
 export async function* sync(latestMessage, settings, logger) {
     rpcURL = URL.parse(settings.jsonRpc);
     let latestSaved;
     let data;
+    if(settings.cerby) {
+        cerby = settings.cerby;
+    }
     try {
         while(true) {
             const latest = (await latestMessage())?.value;
@@ -71,7 +74,7 @@ async function makeRequest(stakeType, apiUrl, logger, latestSaved, latest?) {
 async function normalization(received, settings) {
     await received;
     let OtherPrice = await getPrice(`${settings.pair.toLowerCase()}InUsd`, settings.ETHpriceGraph);
-    let DEFTPrice = await getPrice('deftInUsd', settings.DEFTpriceGraph);
+    let DEFTPrice = await getPrice(`${cerby}InUsd`, settings.DEFTpriceGraph);
     console.log(OtherPrice, DEFTPrice);
     let promises = received.map(async (stake) => {
         stake.transactionFeeInUsd = ((Number(stake.gasUsed) * Number(stake.gasPrice)) / 1e18) * +OtherPrice
