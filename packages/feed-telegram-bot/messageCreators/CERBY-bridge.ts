@@ -33,6 +33,14 @@ export function createMessage(options: Message, constants) {
             link = `https://polygonscan.com/tx/${options.Mint.txHash}`;
             from = `https://polygonscan.com/address/${options.Mint.sender}`
             break;
+        case "Avax":
+            link = `https://snowtrace.io/tx/${options.Mint.txHash}`;
+            from = `https://snowtrace.io/address/${options.Mint.sender}`;
+            break;
+        case "Ftm":
+            link = `https://ftmscan.com/tx/${options.Mint.txHash}`;
+            from = `https://ftmscan.com/address/{options.Mint.sender}`;
+            break;
         default:
             throw "Error, symbol not found! "
     }
