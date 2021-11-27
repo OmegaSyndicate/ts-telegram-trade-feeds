@@ -228,6 +228,50 @@
                     "fromTimestamp": 1634256000
                 }
             ]
+        },
+        {
+            "token": "Avalanche",
+            "pair": "Avax",
+            "stakingTypes": ["started", "canceled", "completed"],
+            "type": "CERBY-staking",
+            "cerby": "cerby",
+            "apiURL": "http://nodes2.valar-solutions.com:8000/subgraphs/name/cerby/staking-avalanche",
+            "jsonRpc": "none",
+            "ETHpriceGraph": "http://nodes2.valar-solutions.com:8000/subgraphs/name/cerby/cerby-traderjoe-v2",
+            "DEFTpriceGraph": "http://nodes2.valar-solutions.com:8000/subgraphs/name/cerby/cerby-traderjoe-v2",
+            "synchronizeIntervalMs": 30000,
+            "publishers": [
+                {
+                    "channel": "@DefiPlazaFeed",
+                    "USDInterval": 1000,
+                    "withSync" : true,
+                    "scanURL": "https://snowtrace.io/",
+                    "minUSD": 100,
+                    "fromTimestamp": 0
+                }
+            ]
+        },
+        {
+            "token": "Fantom",
+            "pair": "Ftm",
+            "stakingTypes": ["started", "canceled", "completed"],
+            "type": "CERBY-staking",
+            "cerby": "cerby",
+            "apiURL": "http://nodes2.valar-solutions.com:8000/subgraphs/name/cerby/staking-fantom",
+            "jsonRpc": "none",
+            "ETHpriceGraph": "http://nodes2.valar-solutions.com:8000/subgraphs/name/cerby/cerby-spookyswap-v2",
+            "DEFTpriceGraph": "http://nodes2.valar-solutions.com:8000/subgraphs/name/cerby/cerby-spookyswap-v2",
+            "synchronizeIntervalMs": 30000,
+            "publishers": [
+                {
+                    "channel": "@DefiPlazaFeed",
+                    "USDInterval": 1000,
+                    "withSync" : true,
+                    "scanURL": "https://snowtrace.io/",
+                    "minUSD": 100,
+                    "fromTimestamp": 0
+                }
+            ]
         }
     ]
 }
