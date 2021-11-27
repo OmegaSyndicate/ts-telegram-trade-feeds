@@ -53,18 +53,20 @@ config.tokens.forEach(token => {
             } else {
                 if(token.stakingTypes && token.stakingTypes instanceof Array) {
                     token.stakingTypes.forEach(async (stakingType) => {
-                        publisher.stakingType = stakingType; 
-                        const newKey = publisherKey(publisher);
+                        publisher.stakingType = stakingType;
+                        const config = { ...publisher };
+                        const newKey = publisherKey(config);
                         publishers[newKey] = {
-                            worker: await createPublisher(publisher, "feed"),
-                            config: publisher,
+                            worker: await createPublisher(config, "feed"),
+                            config,
                             isRunning: false
                         }
                     })
                 } else {
+                    const config = { ...publisher };
                     publishers[key] = {
-                        worker: await createPublisher(publisher, "feed"),
-                        config: publisher,
+                        worker: await createPublisher(config, "feed"),
+                        config,
                         isRunning: false
                     }
                 }
@@ -118,4 +120,5 @@ createLogger()
 // }
 
 setTimeout(workerPoll.bind(null, publishers, logger), (workerNum + 1) * workerTimeoutStart);
+setTimeout(console.log.bind(null, publishers, 1000))
 setInterval(workerPoll.bind(null, publishers, logger), config.workerPoll * 1e3)
