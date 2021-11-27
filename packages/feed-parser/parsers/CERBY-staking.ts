@@ -88,7 +88,7 @@ async function normalization(received, settings) {
             // stake.penalty = BigInt((await createRPCRequest("getPenalty", { id: stake.id, days, interest: BigInt(stake.interest)})).result || 0).toString();
             stake.rewardAmount = (Number(stake.interest)) - (Number(stake.penalty));
             stake.roi = (((stake.rewardAmount) / Number(stake.stakedAmount)) * 100).toString();
-        } else if(+stake.endDay && +stake.endDay < +stake.startDay + +stake.lockDays - 1) {
+        } else if(+stake.canceledAt) {
             stake.feedType = "stakeCanceled";
             stake.rewardAmount = (Number(stake.interest)) - (Number(stake.penalty));
             stake.roi = (((stake.rewardAmount) / Number(stake.stakedAmount)) * 100).toString();
