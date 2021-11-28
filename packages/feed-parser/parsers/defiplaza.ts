@@ -54,7 +54,7 @@ async function makeRequest(token, logger, latestSaved, latest?) {
         for(let type = 0; type <= 1; type++) { // type 0 == 'buy', type 1 == 'sold'
             let typeTransaction: "buy" | "sold" = type ? "sold" : "buy";
             for(let amount = 1000, offset = 0; amount >= 1000; offset += amount) {
-                let tempReceived = await request("POST", apiUrl, { query: createSwapsQuery(typeTransaction, token, 1000, offset) }, logger);
+                let tempReceived = await request("POST", apiUrl, { query: createSwapsQuery(typeTransaction, token, 0, 1000, offset) }, logger);
                 if(tempReceived['errors']) {
                     logger.error(tempReceived.errors);
                     return;
@@ -83,7 +83,7 @@ async function makeRequest(token, logger, latestSaved, latest?) {
             let typeTransaction: "buy" | "sold" = type ? "sold" : "buy";
             let amount = amounts[typeTransaction] || 10,
                 offset = offsets[typeTransaction] || 0;
-            let tempReceived = await request("POST", apiUrl, { query: createSwapsQuery(typeTransaction, token, amount, offset) });
+            let tempReceived = await request("POST", apiUrl, { query: createSwapsQuery(typeTransaction, token, lastObject.timestamp, amount, offset) });
             if(tempReceived['errors'] || (!tempReceived.data.swaps.length && type > 1)) {
                 logger.error(tempReceived.errors || "The transaction was not found.");
                 return;
@@ -168,11 +168,10 @@ interface receivedType {
     sold: Array<any>;
 }
 
-console.log(createSwapsQuery("buy", "0x6468e79a80c0eab0f9a2b574c8d5bc374af59414"))
 
-function createSwapsQuery(type: "buy" | "sold", token: string, first = 1000, skip = 0) {
+function createSwapsQuery(type: "buy" | "sold", token: string, timestamp: number, first = 1000, skip = 0) {
     return `query {swaps(first: ${first}, skip: ${skip}, orderBy: timestamp, orderDirection: asc,
-        where: {${type == "buy" ? "inputToken" : "outputToken"}: \"${token}\"}) {
+        where: {${type == "buy" ? "inputToken" : "outputToken"}: \"${token}\", timestamp_gte: ${timestamp}}) {
           id
           timestamp
           sender
