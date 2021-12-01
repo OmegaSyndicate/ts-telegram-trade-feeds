@@ -34,5 +34,5 @@ export function createMessage(options: Message, constants={USDInterval: 500, uni
             `${options.feedType == "uniswapBuy" ? "Bought" : "Sold"} *${numWithCommas(Math.ceil(options.amountRadix))} EXRD* for *${numWithCommas(Math.ceil(options.amountRadixInUsd))} USDC* on Uniswap (Gas Fee: $${numWithCommas(Math.ceil(options.transactionFeeInUsd))})\n\n` +
             `${generateDots(options, constants)}\n\n` +
             `From address: [${shortenAddress(options.fromAddress)}](${createEtherscanLink("address", options.fromAddress)})\n\n` +
-            `🦄 [Uniswap](https://v2.info.uniswap.org/pair/${constants.uniswapPair}) | 📶 [Tx Hash](${createEtherscanLink("tx", options.transactionHash)}) | 📊 [Dextools](https://www.dextools.io/app/ether/pair-explorer/0x684b00a5773679f88598a19976fbeb25a68e9a5f) | ℹ️ [Info](https://telegra.ph/Valar-List-of-informational-bots-03-23)`
+            `🦄 [Uniswap](https://v2.info.uniswap.org/pair/${constants.uniswapPair}) | 📶 [Tx Hash](${createEtherscanLink("tx", options.transactionHash)}) | 📊 [Dextools](https://www.dextools.io/app/ether/pair-explorer/0x684b00a5773679f88598a19976fbeb25a68e9a5f) | 💥 [Powered by CERBY Token](https://t.me/CerbyToken)`
 }

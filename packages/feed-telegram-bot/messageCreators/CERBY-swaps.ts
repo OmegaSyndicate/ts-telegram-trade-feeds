@@ -24,5 +24,5 @@ export function createMessage(options: any, constants) {
             `${options.feedType == "buy" ? "Bought" : "Sold"} *${numWithCommas(Math.floor(options.amountDeft * 1000) / 1000)} CERBY* for *${numWithCommas(Math.ceil(options.amountDeftInUsd * 1000) / 1000)} ${constants.token.toUpperCase()}* on ${constants.stakingType} (Gas Fee: $${numWithCommas(Math.ceil(options.transactionFeeInUsd))})\n\n` +
             `${generateDots(options.amountDeftInUsd, constants, options.feedType == "buy" ? "🟢" : "🔴")}\n\n` +
             `From address: [${shortenAddress(options.from)}](${constants.scanURL}address/${options.from})\n\n` +
-            `${constants.chain} | 📶 [Tx Hash](${constants.scanURL}tx/${options.txHash}) ${constants.DexToolsLink ? `| 📊 [Dextools](${constants.DexToolsLink}) ` : ''}| ℹ️ [Info](https://telegra.ph/Valar-List-of-informational-bots-03-23)`
+            `${constants.chain} | 📶 [Tx Hash](${constants.scanURL}tx/${options.txHash}) ${constants.DexToolsLink ? `| 📊 [Dextools](${constants.DexToolsLink}) ` : ''}| 💥 [Powered by CERBY Token](https://t.me/CerbyToken)`
 }
