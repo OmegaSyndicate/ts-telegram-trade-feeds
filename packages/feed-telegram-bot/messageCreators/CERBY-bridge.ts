@@ -37,7 +37,7 @@ export function createMessage(options: Message, constants) {
             link = `https://snowtrace.io/tx/${options.Mint.txHash}`;
             from = `https://snowtrace.io/address/${options.Mint.sender}`;
             break;
-        case "Ftm":
+        case "FTM":
             link = `https://ftmscan.com/tx/${options.Mint.txHash}`;
             from = `https://ftmscan.com/address/{options.Mint.sender}`;
             break;
