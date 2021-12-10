@@ -25,7 +25,7 @@ export function createMessage(options: any, constants) {
             price = options.inputToken.tokenPriceUSD;
         }
         return `📙 *1 ${symbol.toUpperCase()} = ${(+price).toFixed(4)} USD*\n` +
-               `Purchased *${numWithCommas(Math.floor(+options.inputAmount * 1000) / 1000)} ${options.inputToken.symbol.toUpperCase()}* for *${numWithCommas(Math.floor(+options.outputAmount * 1000) / 1000)} ${options.outputToken.symbol.toUpperCase()}* on Defi Plaza (Gas Fee: $${numWithCommas(Math.ceil(gasFee))})\n\n` +
+               `Purchased *${numWithCommas(Math.floor(+options.inputAmount * 1000) / 1000)} ${options.inputToken.symbol.toUpperCase()}* for *${numWithCommas(Math.floor(+options.outputAmount * 1000) / 1000)} ${options.outputToken.symbol.toUpperCase()}* on DefiPlaza (Gas Fee: $${numWithCommas(Math.ceil(gasFee))})\n\n` +
                 `${generateDots(options.swapUSD, constants, '🟠')}\n\n` +
                 `From address: [${shortenAddress(options.sender)}](${createEtherscanLink("address", options.sender)})\n\n` +
                 `🏛 [Defi Plaza](https://defiplaza.net/swap) | 📶 [Tx Hash](${createEtherscanLink("tx", options.id)}) | 💥 [Powered by CERBY Token](https://t.me/CerbyToken)`
