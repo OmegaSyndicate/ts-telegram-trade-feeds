@@ -16,7 +16,7 @@ export function createMessage(options: Message, constants) {
     let symbol = options.currency_pair.split('_')[1];
     let swapInUsd = options.anotherPrice ? (options.anotherPrice * +options.price) * +options.amount : +options.amount * +options.price
     return `${options.side == "buy" ? "🚀" : "👹"} *1 ${constants.token} = ${options.anotherPrice ? `${(options.anotherPrice * +options.price).toFixed(2)} USD (${(+options.price).toFixed(6)} ${symbol})` : `${(+options.price).toFixed(2)} ${symbol}`}*\n`
-    +   `${options.side == "buy" ? "Bought" : "Sold"} *${numWithCommas(Math.ceil(+options.amount))} ${constants.token}* for *${options.anotherPrice ? (+options.amount * +options.price).toFixed(4) : numWithCommas(Math.ceil(+options.amount * +options.price))} ${symbol}* on Gate\n\n`
+    +   `${options.side == "buy" ? "Покупка" : "Продажа"} *${numWithCommas(Math.ceil(+options.amount))} ${constants.token}* за *${options.anotherPrice ? (+options.amount * +options.price).toFixed(4) : numWithCommas(Math.ceil(+options.amount * +options.price))} ${symbol}* на Gate\n\n`
     +   `${generateDots({ feedType: (options.side == "buy" ? "uniswapBuy" : options.side), amountRadixInUsd: swapInUsd}, constants)}\n\n`
-    +   `${constants.mainLink} | 🚪 [Gate.io](${constants.tradeLinks[symbol]}) | 💥 [Powered by CERBY Token](https://t.me/CerbyToken)`
+    +   `${constants.mainLink} | 🚪 [Gate.io](${constants.tradeLinks[symbol]}) | 💥 [При поддержке CERBY Token](https://t.me/CerbyToken)`
 }

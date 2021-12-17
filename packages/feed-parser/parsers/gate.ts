@@ -1,4 +1,5 @@
 import * as ws from 'ws';
+import { request } from '../helpers/request';
 
 // wss://api.gateio.ws/ws/v4/
 
@@ -18,7 +19,7 @@ export async function* sync(latestMessage, settings, logger) {
             setTimeout(() => {
                 if(!connected) {
                     tempReceived = undefined;
-                    throw "The connection failed for an unknown reason after 5 minutes.";
+                    logger.error("The connection failed for an unknown reason after 5 minutes.");
                 }
             }, 300*1e3)
     })
@@ -33,17 +34,48 @@ export async function* sync(latestMessage, settings, logger) {
     });
     w.on('close', () => {
         tempReceived = undefined;
-        throw "The websocket connection was closed."
+        logger.error("The websocket connection was closed.");
     });
     w.on('error', (msg) => {
         logger.error('An error has occurred in the websocket connection.');
         tempReceived = undefined;
-        throw "An error has occurred in the websocket connection."
+        // throw "An error has occurred in the websocket connection."
     })
     while(true) {
         let received = tempReceived;
         tempReceived = []
-        yield received.map(t => JSON.stringify(t));
+
+        let ethereum;
+        let bitcoin;
+        if(received.length > 0) {
+            await Promise.all(settings.pairs.map(async (pair) => {
+                if(!pair.toLowerCase().includes('usd')) {
+                    let anotherSymbol = pair.split('_')[1].toLowerCase();
+                    if(anotherSymbol.includes('btc')) {
+                        anotherSymbol = 'bitcoin';
+                    } else if(anotherSymbol.includes('eth')) {
+                        anotherSymbol = 'ethereum';
+                    }
+                    let anotherPrice = (await request('GET', "https://api.coingecko.com/api/v3/simple/price", { params: {
+                        ids: anotherSymbol,
+                        vs_currencies: "usd"
+                    }}))[anotherSymbol].usd;
+                    if(anotherSymbol == 'bitcoin') {
+                        bitcoin = anotherPrice;
+                    } else if(anotherSymbol == 'ethereum') {
+                        ethereum = anotherPrice;
+                    }
+                }
+            }));
+        }
+        yield received.map((t) => {
+            if(t.currency_pair.toLowerCase().includes('btc')) {
+                t.anotherPrice = bitcoin;
+            } else if(t.currency_pair.toLowerCase().includes('eth')) {
+                t.anotherPrice = ethereum;
+            }
+            return JSON.stringify(t);
+        });
     }
 }
 

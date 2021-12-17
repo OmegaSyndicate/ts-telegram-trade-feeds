@@ -1,4 +1,3 @@
-import { Logger } from "../helpers/logger";
 import { request } from "../helpers/request";
 
 // https://ftx.com/api/markets/TONCOIN/USD/trades
