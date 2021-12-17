@@ -12,7 +12,7 @@ export async function* sync(latestMessage, settings, logger) {
             w.send(JSON.stringify({op: "subscribe",args:[{channel:"trades",instId: settings.pair}]}));
             setInterval(() => {
                 w.send('ping');
-            }, 30000)
+            }, 20000)
             setTimeout(() => {
                 if(!connected) {
                     tempReceived = undefined;
