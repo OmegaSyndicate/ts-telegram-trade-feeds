@@ -14,7 +14,7 @@ export async function* sync(latestMessage, settings, logger) {
             let first = pairs[0];
             for(let i = 1; i < pairs.length; i++) {
                 let two = pairs[i];
-                first = mergeTransactions(first, two, String(latest));
+                first = mergeTransactions(first, two, latest);
             }
             data = first;
         } else {
@@ -75,7 +75,7 @@ function mergeTransactions(first: Transaction[], two: Transaction[], latestSaved
         result.push(two[j++]);
     }
     if(latestSaved) {
-        const latestTHash = JSON.parse(latestSaved).trade_id;
+        const latestTHash = JSON.parse(String(latestSaved)).trade_id;
         result.forEach((transaction) => {
             if(transaction.trade_id == latestTHash) {
                 throw new Error("Duplicate transaction found during merge.\n"
