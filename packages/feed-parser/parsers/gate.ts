@@ -16,6 +16,9 @@ export async function* sync(latestMessage, settings, logger) {
                 event: "subscribe",
                 payload: settings.pairs
             }));
+            setInterval(() => {
+                w.send('ping');
+            }, 20000)
             setTimeout(() => {
                 if(!connected) {
                     tempReceived = undefined;
@@ -24,6 +27,13 @@ export async function* sync(latestMessage, settings, logger) {
             }, 300*1e3)
     })
     w.on('message', (msg: webSocketEvent) => {
+        if(String(msg) == 'pong') {
+            return;
+        }
+        if(String(msg) == 'ping') {
+            w.send('pong');
+            console.log('pong');
+        }
         msg = JSON.parse(String(msg));
         if(msg.event == "subscribe" && msg.result.status && msg.result.status == "success") {
             connected = true;
