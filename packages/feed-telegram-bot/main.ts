@@ -19,7 +19,7 @@ interface IWorkers {
 let publishers: {[key: string]: IWorkers} = {};
 
 let workerNum = 1;
-let workerTimeoutStart = 10000; // 10 seconds
+let workerTimeoutStart = 3000; // 3 seconds
 async function createPublisher(publisher, type): Promise<Worker> {
     await new Promise(resolve => setTimeout(resolve, workerTimeoutStart*workerNum++))
     const worker = new Worker(`./workers/${type}.worker`, { workerData: publisher, stdout: false })
@@ -120,5 +120,4 @@ createLogger()
 // }
 
 setTimeout(workerPoll.bind(null, publishers, logger), (workerNum + 1) * workerTimeoutStart);
-setTimeout(console.log.bind(null, publishers, 1000))
 setInterval(workerPoll.bind(null, publishers, logger), config.workerPoll * 1e3)
