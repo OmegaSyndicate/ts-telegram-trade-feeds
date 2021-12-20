@@ -68,7 +68,7 @@ export class producerService {
             await consumer.run({ eachMessage: async ({ topic, message }) => { latest_message = message }});
             setTimeout(() => {
                 if(latest_message == null) {
-                    this.logger.error(`Topic: ${this.topic}. The last message has not been received within 1 minute!`)
+                    this.logger.error(`⛔️🆘\nTopic: ${this.topic}. The last message has not been received within 1 minute!`)
                 }
                 if(latest_message == null && +high < 5) {
                     this.logger.error(`Topic: ${this.topic}. The last transaction was not received with offset = ${+high - 2}. Synchronization is being performed again due to an error.`);
