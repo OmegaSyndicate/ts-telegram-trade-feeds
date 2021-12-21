@@ -21,7 +21,7 @@ async function publish(workerData, message: Buffer) {
         const { parser } = await import(`../messageParsers/${workerData.parser ? workerData.parser : workerData.type}`);
         const { createMessage } = await import(`../messageCreators/${workerData.messageCreator ? workerData.messageCreator : workerData.type}`);
         const { validate } = await import(`../validators/${workerData.validator ? workerData.validator : workerData.type}`);
-        const parsedMessage = await parser(message, logger);
+        const parsedMessage = await parser(message, logger, workerData);
         if(await validate(workerData, parsedMessage, logger)) {
             stats++;
             return await createMessage(parsedMessage, workerData, logger);
