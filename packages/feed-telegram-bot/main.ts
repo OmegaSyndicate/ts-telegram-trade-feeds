@@ -46,6 +46,7 @@ config.tokens.forEach(token => {
             publisher.token = token.token;
             publisher.type = token.type;
             publisher.stakingType = token?.stakingType;
+            publisher.pair = token?.pair;
             const key = publisherKey(publisher);
             if(publishers[key]) {
                 console.error("Attention. Duplicate token found. Correct the config.")
