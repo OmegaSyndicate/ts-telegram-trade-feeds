@@ -15,11 +15,11 @@ export function numWithCommas(number) {
 export function shortenAddress(address) {
     switch(address) {
         case "0x8149C0a6f5b5417d30F70e00a05d8D15CF471853":
-            return "Cerby Stablecoin Fund"
+            return "Cerby Stablecoin Reserve"
         case "0x72aCC602f185692b80d66f933Bb679b04aD4583d":
-            return "Cerby Buffer Fund";
+            return "Cerby Business Development Fund";
         case "0x43cFD604C3a59f2eE315d25D5D982257D9D28a3E":
-            return "Cerby Team #1";
+            return "MaratCerby";
         case "0xaeF1352112eE0E98148A10f8e7AAd315c738E98b":
             return "Cerby Team #2";
         case "0x72fe4aB74214f88e48eF39e7B7Fee7a25085e851":
