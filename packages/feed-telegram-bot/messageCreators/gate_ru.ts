@@ -1,4 +1,5 @@
-import { numWithCommas, generateDots } from "./Radix-uniswap"
+import { generateDots } from "./Radix-uniswap"
+import { numWithCommas } from "./ftx_ru";
 
 export interface Message {
     id: number,

@@ -1,4 +1,9 @@
-import { numWithCommas, generateDots } from "./Radix-uniswap"
+import { generateDots } from "./Radix-uniswap"
+
+
+export function numWithCommas(number) {
+    return number.toString().replace(/\B(?=(\d{3})+(?!\d))/g, " ");
+}
 
 export interface Message {
     id: number,
