@@ -33,9 +33,9 @@ async function makeRequest(logger, latestSaved, latest?) {
     let received = [];
     if(!latest) {
         for(let amount = 1000, offset = 0; amount >= 1000; offset += amount) {
-            let tempReceived = await request("POST", apiUrl, { query: createSwapsQuery(0, 1000, offset) }, logger);
-            if(tempReceived['errors']) {
-                logger.error(tempReceived.errors);
+            let tempReceived = await request("POST", apiUrl, { query: createSwapsQuery(received[received.length - 1]?.timestamp || 0, 1000) }, logger);
+            if(tempReceived['errors'] || !tempReceived.data.swaps || !(tempReceived.data.swaps instanceof Array)) {
+                logger.error(tempReceived);
                 return;
             }
             tempReceived.data.swaps = tempReceived.data.swaps.map((t) => 
