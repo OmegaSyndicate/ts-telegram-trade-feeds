@@ -51,7 +51,7 @@ async function makeRequest(pair, logger?, latestString?) {
         }}))[anotherSymbol].usd;
         data = data.map(t => Object.assign(t, { anotherPrice }))
     }
-    return data.filter((t) => {
+    return data.filter((t: any) => {
         if(t.anotherPrice) {
             return (+t.amount * t.anotherPrice) >= 10000;
         }
