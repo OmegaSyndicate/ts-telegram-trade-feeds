@@ -45,7 +45,7 @@ export class producerService {
     }
 
     async getLatestMessage(): Promise<KafkaMessage | undefined> {
-        let groupId = `consumer-get-latest-${uuidv4()}`;
+        let groupId = `consumer-get-latest-${this.topic}`;
         const consumer = this.kafka.consumer({ groupId });
         const admin = this.kafka.admin();
         let latest_message = null;
