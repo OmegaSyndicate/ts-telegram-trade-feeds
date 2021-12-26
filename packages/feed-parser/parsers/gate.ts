@@ -84,8 +84,12 @@ export async function* sync(latestMessage, settings, logger) {
             } else if(t.currency_pair.toLowerCase().includes('eth')) {
                 t.anotherPrice = ethereum;
             }
-            return JSON.stringify(t);
-        });
+        }).filter((t: any) => {
+            if(t.anotherPrice) {
+                return (+t.amount * t.anotherPrice * +t.price) >= 10000;
+            }
+            return (+t.amount * +t.price) >= 10000;
+        }).map(t => JSON.stringify(t));
     }
 }
 

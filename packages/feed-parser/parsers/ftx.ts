@@ -25,7 +25,7 @@ async function makeRequest(settings, logger, latestString?) {
     } else {
         data = received.result.reverse();
     }
-    return data.map(t => JSON.stringify(t));
+    return data.filter((t) => (t.size * t.price) >= 10000).map(t => JSON.stringify(t));
 }
 
 interface apiResponse {

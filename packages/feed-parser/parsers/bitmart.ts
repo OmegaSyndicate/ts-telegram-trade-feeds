@@ -23,7 +23,7 @@ async function makeRequest(settings, logger, latestString?) {
     } else {
         data = received.data.trades.reverse();
     }
-    return data.map(t => JSON.stringify(t));
+    return data.filter(t => +t.amount >= 10000).map(t => JSON.stringify(t));
 }
 
 interface apiResponse {

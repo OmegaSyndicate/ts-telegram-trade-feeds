@@ -51,7 +51,12 @@ async function makeRequest(pair, logger?, latestString?) {
         }}))[anotherSymbol].usd;
         data = data.map(t => Object.assign(t, { anotherPrice }))
     }
-    return data.map((t: Transaction) => Object.assign(t, {pair}));
+    return data.filter((t) => {
+        if(t.anotherPrice) {
+            return (+t.amount * t.anotherPrice) >= 10000;
+        }
+        return +t.amount >= 10000;
+    }).map((t: Transaction) => Object.assign(t, {pair}));
 }
 
 

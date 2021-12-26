@@ -1,3 +1,4 @@
+import { traceDeprecation } from "process";
 import { request } from "../helpers/request";
 
 // GET https://www.mexc.com/open/api/v2/market/deals?symbol=cspr_usdt
@@ -23,7 +24,7 @@ async function makeRequest(settings, logger, latestString?) {
     } else {
         data = received.data.reverse();
     }
-    return data.map(t => JSON.stringify(t));
+    return data.filter((t) => (+t.trade_quantity * +t.trade_price) >= 10000).map(t => JSON.stringify(t));
 }
 
 interface apiResponse {

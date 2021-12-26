@@ -54,7 +54,7 @@ export async function* sync(latestMessage, settings, logger) {
     while(true) {
         let received = tempReceived;
         tempReceived = []
-        yield received.map(t => JSON.stringify(t));
+        yield received.filter((t) => (+t.amount * +t.price) >= 10000).map(t => JSON.stringify(t));
     }
 }
 
