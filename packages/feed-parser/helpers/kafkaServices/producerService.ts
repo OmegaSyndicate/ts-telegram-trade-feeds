@@ -51,7 +51,19 @@ export class producerService {
         const admin = this.kafka.admin();
         let latest_message = null;
         await admin.connect();
-        let [{ high }] = await admin.fetchTopicOffsets(this.topic);
+        let [{ high }] = await (async () => {
+            try {
+                return await admin.fetchTopicOffsets(this.topic)
+            } catch(err) {
+                if(String(err) == "KafkaJSNumberOfRetriesExceeded: This server does not host this topic-partition") {
+                    this.logger.log("New topic");
+                    return [{ high: 0 }];
+                } else {
+                    this.logger.error(err);
+                    throw err;
+                }
+            }
+        })();
         console.log(high);
         let interval;
         if(Number(high)) {
