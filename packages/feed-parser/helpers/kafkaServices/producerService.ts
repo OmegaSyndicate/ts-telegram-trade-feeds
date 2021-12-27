@@ -57,6 +57,8 @@ export class producerService {
             } catch(err) {
                 if(String(err) == "KafkaJSNumberOfRetriesExceeded: This server does not host this topic-partition") {
                     this.logger.log("New topic");
+                    await consumer.connect();
+                    await consumer.subscribe({ topic: this.topic, fromBeginning: false});
                     return [{ high: 0 }];
                 } else {
                     this.logger.error(err);
