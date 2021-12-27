@@ -1,6 +1,7 @@
 import { Kafka, KafkaMessage } from "kafkajs";
 import { Logger } from '../logger';
 import { v4 as uuidv4 } from 'uuid'
+import { nextTick } from "process";
 
 export class producerService {
     readonly kafka: Kafka;
@@ -50,8 +51,6 @@ export class producerService {
         const admin = this.kafka.admin();
         let latest_message = null;
         await admin.connect();
-        await consumer.connect();
-        await consumer.subscribe({ topic: this.topic, fromBeginning: false});
         let [{ high }] = await admin.fetchTopicOffsets(this.topic);
         console.log(high);
         let interval;
@@ -66,6 +65,8 @@ export class producerService {
                     }
                 ]
             });
+            await consumer.connect();
+            await consumer.subscribe({ topic: this.topic, fromBeginning: false});
             await consumer.run({ eachMessage: async ({ topic, message }) => { latest_message = message }});
             interval = setInterval(() => {
                 if(latest_message == null && +high > 5) {
@@ -84,8 +85,8 @@ export class producerService {
         } else {
             latest_message = undefined;
         }
-        admin.disconnect();
         consumer.disconnect();
+        admin.disconnect();
         clearInterval(interval);
         return latest_message;
     }
