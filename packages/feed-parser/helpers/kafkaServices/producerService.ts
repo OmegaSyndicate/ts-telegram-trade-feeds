@@ -69,16 +69,38 @@ export class producerService {
         console.log(high);
         let interval;
         if(Number(high)) {
-            await admin.setOffsets({
-                groupId,
-                topic: this.topic,
-                partitions: [
-                    {
-                        partition: 0,
-                        offset: String(Number(high) - 2)
+            while(true) {
+                let rebalancingAttempts = 0;
+                try {
+                    await admin.setOffsets({
+                        groupId,
+                        topic: this.topic,
+                        partitions: [
+                            {
+                                partition: 0,
+                                offset: String(Number(high) - 2)
+                            }
+                        ]
+                    });
+                    console.log("Set offset ok");
+                    break;
+                } catch(err) {
+                    console.log("ERROR", String(err));
+                    if(String(err) == "KafkaJSNonRetriableError: The consumer group must have no running instances, current state: Stable") {
+                        if(rebalancingAttempts > 120) {
+                            this.logger.error(`The admin client has been waiting for more than 10 minutes for group rebalancing and consumer removal. Current waiting time: ${rebalancingAttempts * 5} seconds`)
+                            throw err;
+                        }
+                        console.log("Waiting for rebalancing and removal of the consumer");
+                        rebalancingAttempts++;
+                        await new Promise(resolve => setTimeout(resolve, 5000));
+                        continue;
+                    } else {
+                        this.logger.error(err);
+                        throw err;
                     }
-                ]
-            });
+                }
+            }
             await consumer.connect();
             await consumer.subscribe({ topic: this.topic, fromBeginning: false});
             await consumer.run({ eachMessage: async ({ topic, message }) => { latest_message = message }});
