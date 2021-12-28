@@ -24,7 +24,7 @@ async function makeRequest(settings, logger, latestString?) {
     } else {
         data = received.data.reverse();
     }
-    return data.filter((t) => (+t.trade_quantity * +t.trade_price) >= 10000).map(t => JSON.stringify(t));
+    return data.filter((t) => (+t.trade_quantity * +t.trade_price) >= settings.minUSD).map(t => JSON.stringify(t));
 }
 
 interface apiResponse {

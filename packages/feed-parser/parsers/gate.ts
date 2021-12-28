@@ -87,9 +87,9 @@ export async function* sync(latestMessage, settings, logger) {
             return t;
         }).filter((t: any) => {
             if(t['anotherPrice'] != undefined) {
-                return (+t.amount * t.anotherPrice * +t.price) >= 10000;
+                return (+t.amount * t.anotherPrice * +t.price) >= settings.minUSD;
             }
-            return (+t.amount * +t.price) >= 10000;
+            return (+t.amount * +t.price) >= settings.minUSD;
         }).map(t => JSON.stringify(t));
     }
 }

@@ -9,7 +9,7 @@ export async function* sync(latestMessage, settings, logger) {
         let data;
         if(settings.pairs instanceof Array) {
             let pairs: Transaction[][] = await Promise.all(settings.pairs.map(async (pair) => {
-                return await makeRequest(pair, logger, latest);
+                return await makeRequest(pair, settings, logger, latest);
             }));
             let first = pairs[0];
             for(let i = 1; i < pairs.length; i++) {
@@ -18,13 +18,13 @@ export async function* sync(latestMessage, settings, logger) {
             }
             data = first;
         } else {
-            data = await makeRequest(settings.pairs, logger, latest);
+            data = await makeRequest(settings.pairs, settings, logger, latest);
         }
         yield data.map(t => JSON.stringify(t));
     }
 }
 
-async function makeRequest(pair, logger?, latestString?) {
+async function makeRequest(pair, settings, logger?, latestString?) {
     const received: apiResponse = (await request("POST", `https://api.exmo.com/v1.1/trades`, `pair=${pair}` ));
     if(!Object.keys(received).length || received.error) {
         logger.error(`An error occurred while making a request from EXMO.`);
@@ -53,9 +53,9 @@ async function makeRequest(pair, logger?, latestString?) {
     }
     return data.filter((t: any) => {
         if(t.anotherPrice) {
-            return (+t.amount * t.anotherPrice) >= 10000;
+            return (+t.amount * t.anotherPrice) >= settings.minUSD;
         }
-        return +t.amount >= 10000;
+        return +t.amount >= settings.minUSD;
     }).map((t: Transaction) => Object.assign(t, {pair}));
 }
 

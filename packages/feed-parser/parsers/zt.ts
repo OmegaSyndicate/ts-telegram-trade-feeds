@@ -24,7 +24,7 @@ async function makeRequest(settings, logger, latestString?) {
     } else {
         data = received.reverse();
     }
-    return data.filter(t => (+t.amount * +t.price) >= 10000).map(t => JSON.stringify(Object.assign(t, { pair: settings.pair })));
+    return data.filter(t => (+t.amount * +t.price) >= settings.minUSD).map(t => JSON.stringify(Object.assign(t, { pair: settings.pair })));
 }
 
 interface Transaction {
