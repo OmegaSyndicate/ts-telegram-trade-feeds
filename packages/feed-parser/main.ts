@@ -43,6 +43,13 @@ config.tokens.forEach(token => {
         logger.error("Attention. Duplicate token found. Correct the config.")
     } else {
         token.kafkaSettings = config.kafkaSettings;
+        let minUSD;
+        token.publishers.forEach((publisher) => {
+            if(publisher.minUSD < minUSD || minUSD == undefined) {
+                minUSD = publisher.minUSD;
+            }
+        })
+        token.minUSD = minUSD;
         delete token.publishers;
         if(token.stakingTypes && token.stakingTypes instanceof Array) {
             token.stakingTypes.forEach((el) => {
