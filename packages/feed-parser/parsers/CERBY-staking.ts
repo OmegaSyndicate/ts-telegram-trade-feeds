@@ -34,7 +34,7 @@ export async function* sync(latestMessage, settings, logger) {
     }
 }
 
-async function makeRequest(stakeType, apiUrl, logger, latestSaved, latest?) {
+async function makeRequest(stakeType: string, apiUrl, logger, latestSaved, latest?) {
     let received = [];
     let data = [];
     console.log(apiUrl)
@@ -58,7 +58,7 @@ async function makeRequest(stakeType, apiUrl, logger, latestSaved, latest?) {
             logger.error(tempReceived.errors);
             return;
         }
-        tempReceived.data.stakes = tempReceived.data.stakes.filter(t => t.timestamp > lastObject.timestamp);
+        tempReceived.data.stakes = tempReceived.data.stakes.filter(t => +t[`${stakeType}At`] > +lastObject[`${stakeType}At`]);
         const tempIds = tempReceived.data.stakes.map(searchString);
         if(~tempIds.indexOf(searchString(lastString)) || ~tempIds.indexOf(searchString(JSON.parse(latestSaved)))) {
             logger.error(`An attempt to insert a duplicate was detected, throwing an exception. Timestamp: ${lastObject.timestamp}`);
@@ -175,7 +175,7 @@ function searchString(transaction) {
 function createBridgeQuery(stakeType: string, first = 1000, skip = 0, fromTimestamp = 0) {
     return `query {
         stakes(first: ${first}, skip: ${skip}, where: {${stakeType}At_gte: ${fromTimestamp}},
-            orderBy: timestamp, orderDirection: asc) {
+            orderBy: ${stakeType}At, orderDirection: asc) {
             id
             owner {
                 id
