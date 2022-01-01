@@ -51,7 +51,7 @@ async function makeRequest(stakeType: string, apiUrl, logger, latestSaved, lates
         return received;
     } else {
         const lastObject = JSON.parse(String(latest));
-        let lastString = searchString(lastObject);
+        let lastString = searchString(stakeType, lastObject);
         let tempReceived = await request("POST", apiUrl, { query: createBridgeQuery(stakeType, 1000, 0, lastObject.timestamp) }, logger);
         console.log(tempReceived)
         if(tempReceived['errors']) {
@@ -59,8 +59,8 @@ async function makeRequest(stakeType: string, apiUrl, logger, latestSaved, lates
             return;
         }
         tempReceived.data.stakes = tempReceived.data.stakes.filter(t => +t[`${stakeType}At`] > +lastObject[`${stakeType}At`]);
-        const tempIds = tempReceived.data.stakes.map(searchString);
-        if(~tempIds.indexOf(searchString(lastString)) || ~tempIds.indexOf(searchString(JSON.parse(latestSaved)))) {
+        const tempIds = tempReceived.data.stakes.map(searchString.bind(null, stakeType));
+        if(~tempIds.indexOf(searchString(stakeType, lastString)) || ~tempIds.indexOf(searchString(stakeType, JSON.parse(latestSaved)))) {
             logger.error(`An attempt to insert a duplicate was detected, throwing an exception. Timestamp: ${lastObject.timestamp}`);
 
             logger.log(`Received: ${JSON.stringify(tempReceived.data.stakes)}`);
@@ -167,8 +167,8 @@ function numTo256(number) {
 }
 
 
-function searchString(transaction) {
-    return `${transaction.blockNumber}-${transaction.startTx}-${transaction.timestamp}`;
+function searchString(stakeType, transaction) {
+    return `${transaction.blockNumber}-${transaction.startTx}-${transaction[`${stakeType}At`]}`;
 }
 
 
