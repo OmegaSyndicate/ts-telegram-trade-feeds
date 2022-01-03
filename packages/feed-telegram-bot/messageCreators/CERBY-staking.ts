@@ -42,14 +42,14 @@ export async function createMessage(options: Message, constants, logger) {
             emoji = "📕";
             boundEmoji = "⚫️"
             additionalInfo = `🚫 Penalty: ${numWithCommas(Math.ceil(+options.penalty))} CERBY (${numWithCommas(Math.ceil((Math.abs(options.rewardAmount) * +options.deftInUsd) * 1e3) / 1e3)}$)\n`
-                           + `📉 ROI: ${options.roi}%\n\n`;
+                           + `📉 ROI: ${Math.ceil(+options.roi * 100) / 100}%\n\n`;
             days = +options.endDay - +options.startDay + 1
             break;
         case "stakeCompleted":
             emoji = "📗"
             boundEmoji = "🟣"
             additionalInfo = `${options.rewardAmount > 0 ? '💰 Reward' : '🚫 Penalty'}: ${numWithCommas(Math.ceil(Math.abs(options.rewardAmount)))} CERBY (${numWithCommas(Math.ceil((Math.abs(options.rewardAmount) * +options.deftInUsd) * 1e3) / 1e3)}$)\n` +
-                             `📉 ROI: ${Math.ceil(+options.roi * 1000) / 1000}%\n\n`;
+                             `📉 ROI: ${Math.ceil(+options.roi * 100) / 100}%\n\n`;
             days = +options.endDay - +options.startDay + 1;
             break;
         case "stakeStarted":
