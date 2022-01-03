@@ -84,5 +84,5 @@ export function createMessage(options: Message, constants, logger: Logger) {
             `${generateDots(options.amountWiseInUsd, constants, boundEmoji)}\n\n` +
             additionalInfo +
             `From address: [${shortenAddress(options.fromAddress)}](${createEtherscanLink("address", options.fromAddress)})\n\n` +
-            `📶 [Tx Hash](${createEtherscanLink("tx", options.transactionHash)}) | 💥 [Powered by CERBY Token](https://t.me/CerbyToken)`
+            `📶 [Tx Hash](${createEtherscanLink("tx", options.transactionHash)}) | 💥 [Powered by Cerby Finance](https://cerby.fi)`
 }

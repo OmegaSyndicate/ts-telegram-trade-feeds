@@ -65,5 +65,5 @@ export async function createMessage(options: Message, constants, logger) {
             `${generateDots(+options.stakedAmount * +options.deftInUsd, constants, boundEmoji)}\n\n` +
             additionalInfo +
             `From address: [${shortenAddress(options.owner.id)}](${constants.scanURL}address/${options.owner.id})\n\n` +
-            `🥩 [Staking](https://app.cerby.fi/staking) | 📶 [Tx Hash](${constants.scanURL}tx/${options.feedType == "stakeStarted" ? options.startTx : options.endTx}) | 💥 [Powered by CERBY Token](https://t.me/CerbyToken)`
+            `🥩 [Staking](https://app.cerby.fi/staking) | 📶 [Tx Hash](${constants.scanURL}tx/${options.feedType == "stakeStarted" ? options.startTx : options.endTx}) | 💥 [Powered by Cerby Finance](https://cerby.fi)`
 }
