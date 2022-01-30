@@ -42,6 +42,7 @@ config.tokens.forEach(token => {
     if(token.publishers && token.publishers instanceof Array) {
         token.publishers.forEach(async (publisher: any) => {
             publisher.botToken = config.botToken;
+            publisher.discordToken = config.discordToken;
             publisher.kafkaSettings = config.kafkaSettings;
             publisher.token = token.token;
             publisher.type = token.type;

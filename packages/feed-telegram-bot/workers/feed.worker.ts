@@ -1,9 +1,9 @@
 import { workerData, parentPort } from 'worker_threads';
 import { consumerService } from '../helpers/kafkaServices/consumerService';
 import { telegramBot } from '../helpers/telegramBot';
+import { DiscordBot } from '../helpers/discordBot';
 import { Logger } from '../../feed-parser/helpers/logger';
 import { producerService } from '../../feed-parser/helpers/kafkaServices/producerService';
-import { createImportSpecifier } from 'typescript';
 // import { Logger } from '../helpers/logger';
 
 const topic = `${workerData.token}-${workerData.type}${workerData.stakingType ? `-${workerData.stakingType}` : ''}`;
@@ -11,7 +11,9 @@ console.log("TOPIC", topic);
 const workerInfo = `publisher-${topic}-${workerData.channel}`;
 const logProducer = new producerService("logs", `logger-${workerInfo}`, workerData.kafkaSettings);
 const logger = new Logger(workerInfo, logProducer.sendMessages.bind(logProducer))
-const bot = new telegramBot(workerData.botToken, workerData.channel, logger, workerData.syncAmountPubs);
+const bot = (workerData.channel[0] == '#' ?
+      new DiscordBot(workerData.discordToken, workerData.channel.slice(1), logger, workerData.syncAmountPubs)
+    : new telegramBot(workerData.botToken, workerData.channel, logger, workerData.syncAmountPubs));
 const consumer = new consumerService(topic, workerInfo, workerInfo, workerData.kafkaSettings, logger);
 
 let stats = 0;
