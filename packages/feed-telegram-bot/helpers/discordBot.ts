@@ -42,7 +42,15 @@ export class DiscordBot {
     }
     async sendMessage(message: string) {
         if(!message) return;
-        (await this.channel).send(message);
+        // let messageArray = message.replace(/\*/gi, '**').split('\n');
+        (await this.channel).send({
+            embeds: [
+                {
+                    // title: messageArray.splice(1,1).join(''),
+                    description: message // messageArray.join('\n')
+                }
+            ]
+        });
         return 0;
     }
 }
