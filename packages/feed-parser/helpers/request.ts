@@ -2,7 +2,7 @@ import axios from 'axios';
 
 const sleep = timems => new Promise((resolve) => setTimeout(resolve, timems));
 
-export async function request(type: "GET" | "POST", url: string, config?, logger?): Promise<any> {
+export async function request(type: "GET" | "POST", url: string, config?, logger?, attempt = 0): Promise<any> {
     console.log(type, url, config);
     try {
         let response;
@@ -18,14 +18,14 @@ export async function request(type: "GET" | "POST", url: string, config?, logger
         }
         return response.data;
     } catch(error) {
-        const errorMessage = `An error occurred during the request. I repeat the request in 5 seconds.\n${error}`;
+        const errorMessage = `An error occurred during the request. I repeat the request in 5 seconds. Attempt: ${attempt}\n${error}`;
         console.error(errorMessage);
         console.error(error);
-        if(logger) {
+        if(logger && attempt >= 5) {
             logger.log(errorMessage);
         }
 
         await sleep(5000);
-        return await request(type, url, config, logger);
+        return await request(type, url, config, logger, ++attempt);
     }
 }
