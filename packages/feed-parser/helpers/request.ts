@@ -22,7 +22,7 @@ export async function request(type: "GET" | "POST", url: string, config?, logger
         console.error(errorMessage);
         console.error(error);
         if(logger && attempt >= 5) {
-            logger.log(errorMessage);
+            logger.warn(errorMessage);
         }
 
         await sleep(5000);

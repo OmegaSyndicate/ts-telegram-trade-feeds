@@ -37,7 +37,7 @@ export async function* sync(latestMessage, settings, logger) {
         }
 
         if(msg.tick) {
-            tempReceived = tempReceived.concat(msg.tick.data);
+            tempReceived = tempReceived.concat(msg.tick.data || {});
         }
     });
     w.on('close', () => {
