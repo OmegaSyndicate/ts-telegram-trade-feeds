@@ -11,7 +11,7 @@ export async function request(type: "GET" | "POST", url: string, config?, logger
                 response = await axios.get(url, config);
                 break;
             case "POST":
-                response = await axios.post(url, config);
+                response = await axios.post(url, config && config.data_raw ? config.data_raw : { query: config.query }, config);
                 break;
             default:
                 throw new Error(`Invalid type ${type}`);
