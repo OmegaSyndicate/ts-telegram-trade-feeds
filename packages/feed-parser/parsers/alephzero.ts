@@ -19,7 +19,7 @@ export async function* sync(latestMessage, settings, logger) {
                 await new Promise((resolve) => setTimeout(resolve, 60000));
                 throw new Error("The received last saved transaction from kafka does not match the one saved in the current instance.");
             }
-            yield data = (normalization(await makeRequest(latest ? String(latest.extrinsic_index) : undefined))).map(t => JSON.stringify(t));
+            yield data = (normalization(await makeRequest(latest ? JSON.parse(String(latest)).extrinsic_index : undefined))).map(t => JSON.stringify(t));
             if(data.length) {
                 latestSaved = JSON.stringify(data.slice(-1));
             }
