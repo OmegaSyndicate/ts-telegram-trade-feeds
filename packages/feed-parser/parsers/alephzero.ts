@@ -2,7 +2,7 @@ import { isBuffer } from "util";
 import { Logger } from "../helpers/logger";
 import { request } from "../helpers/request";
 
-const apiURL = "https://alephzero.api.subscan.io/api/scan/transfers";
+const apiURL = "https://alephzero.api.subscan.io/";
 const apiKey = "03f7cf1c0d0741aed2be3cfb53855f9c";
 const mexcAddress = "5H3JuUqCKm28Gz6Z1JpLhRzN3f4UJK1XhktbUQWhFuRJnFvb";
 
@@ -32,17 +32,23 @@ export async function* sync(latestMessage, settings, logger) {
 }
 
 export async function makeRequest(extrinsic_index?: string, logger?): Promise<transfer[]> {
-    const response = await request("POST", apiURL, {
+    const response = await request("POST", apiURL + 'api/scan/transfers', {
         data_raw: `{ "row": 100, "page": 0, "address": "${mexcAddress}" }`,
         headers: {
             "Content-Type": "application/json",
             "X-API-Key": apiKey
         }
-    })
+    });
+    let price = (await request('GET', "https://api.coingecko.com/api/v3/simple/price", { params: {
+        ids: "aleph-zero",
+        vs_currencies: "usd"
+    }}))['aleph-zero'].usd;
     if(response.code != 0) {
         throw response;
     }
-    let transfers: transfer[] = response.data.transfers.reverse();
+    let transfers: transfer[] = response.data.transfers.map((transfer) => {
+        return { ...transfer, price }
+    }).reverse();
     if(!extrinsic_index) {
         return transfers;
     } else {
@@ -60,6 +66,7 @@ export function normalization(transfers: transfer[]): transfer[] {
 
 interface transfer {
     feedType: "withdraw" | "deposit",
+    price: number,
     from: string,
     to: string
     extrinsic_index: string,
