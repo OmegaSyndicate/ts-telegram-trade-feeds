@@ -35,8 +35,8 @@ export interface Message {
 }
 
 export function createMessage(options: Message, constants) {
-    return `📥 ${options.feedType[0].toUpperCase() + options.feedType.slice(1)} *${numWithCommas(Math.ceil(+options.amount))} AZERO (${numWithCommas(Math.ceil(+options.amount * options.price))}$)* to Mexc\n\n` +
+    return `📥 ${options.feedType[0].toUpperCase() + options.feedType.slice(1)} *${numWithCommas(Math.ceil(+options.amount))} AZERO (${numWithCommas(Math.ceil(+options.amount * options.price))}$)* to ${constants.token}\n\n` +
            `${generateDots(+options.amount * options.price, constants, options.feedType == 'deposit' ? '⚪' : '⚫')}\n\n` +
            `${options.feedType == 'deposit' ? "From" : "To"} address: [${shortenAddress(options.feedType == 'deposit' ? options.from : options.to)}](https://alephzero.subscan.io/account/${options.feedType == 'deposit' ? options.from : options.to})\n\n` +
-           `🅰️ [Aleph Zero](https://alephzero.org/) | 🚹 [Mexc](https://www.mexc.com/exchange/AZERO_USDT) | 📶 [Tx Hash](https://alephzero.subscan.io/extrinsic/${options.hash}) | 💥 [Powered by Cerby Finance](https://cerby.fi)`
+           `🅰️ [Aleph Zero](https://alephzero.org/) | ${constants.tradeLink} | 📶 [Tx Hash](https://alephzero.subscan.io/extrinsic/${options.hash}) | 💥 [Powered by Cerby Finance](https://cerby.fi)`
 }

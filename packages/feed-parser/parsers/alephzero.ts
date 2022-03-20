@@ -4,10 +4,11 @@ import { request } from "../helpers/request";
 
 const apiURL = "https://alephzero.api.subscan.io/";
 const apiKey = "03f7cf1c0d0741aed2be3cfb53855f9c";
-const mexcAddress = "5H3JuUqCKm28Gz6Z1JpLhRzN3f4UJK1XhktbUQWhFuRJnFvb";
+let address // = "5H3JuUqCKm28Gz6Z1JpLhRzN3f4UJK1XhktbUQWhFuRJnFvb";
 
 
 export async function* sync(latestMessage, settings, logger) {
+    address = settings.address;
     let latestSaved, data;
     try {
         while(true) {
@@ -33,7 +34,7 @@ export async function* sync(latestMessage, settings, logger) {
 
 export async function makeRequest(extrinsic_index?: string, logger?): Promise<transfer[]> {
     const response = await request("POST", apiURL + 'api/scan/transfers', {
-        data_raw: `{ "row": 100, "page": 0, "address": "${mexcAddress}" }`,
+        data_raw: `{ "row": 100, "page": 0, "address": "${address}" }`,
         headers: {
             "Content-Type": "application/json",
             "X-API-Key": apiKey
@@ -58,7 +59,7 @@ export async function makeRequest(extrinsic_index?: string, logger?): Promise<tr
 
 export function normalization(transfers: transfer[]): transfer[] {
     return transfers.map((transfer) => {
-        transfer.feedType = transfer.from == mexcAddress ? "withdraw" : "deposit";
+        transfer.feedType = transfer.from == address ? "withdraw" : "deposit";
         return transfer;
     });
 }
