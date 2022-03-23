@@ -19,7 +19,7 @@ interface IWorkers {
 let publishers: {[key: string]: IWorkers} = {};
 
 let workerNum = 1;
-let workerTimeoutStart = 3000; // 3 seconds
+let workerTimeoutStart = 500; // 0.5 seconds
 async function createPublisher(publisher, type): Promise<Worker> {
     await new Promise(resolve => setTimeout(resolve, workerTimeoutStart*workerNum++))
     const worker = new Worker(`./workers/${type}.worker`, { workerData: publisher, stdout: false })
