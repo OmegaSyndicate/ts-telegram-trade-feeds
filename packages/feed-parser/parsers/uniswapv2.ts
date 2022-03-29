@@ -45,7 +45,7 @@ async function makeRequest(token: string, pairs: string[], latest, logger) {
     tempReceived.data.swaps = tempReceived.data.swaps.reverse().map(swap => Object.assign(swap, { feedType: swap.pair.token0.symbol == token ? (swap.amount0In > 0 ? "sold" : "buy" ) : (swap.amount1In > 0 ? "sold" : "buy" ) }));
     if(latest) {
         // not really necessary, just for safety
-        tempReceived.data.swaps = tempReceived.data.swaps.filter(t => t.transaction.timestamp > t.transaction.timestamp);
+        tempReceived.data.swaps = tempReceived.data.swaps.filter(t => t.transaction.timestamp > lastObject.transaction.timestamp);
         const tempIds = tempReceived.data.swaps.map(searchString);
         if(~tempIds.indexOf(searchString(lastObject))) {
             logger.error(`An attempt to insert a duplicate was detected, throwing an exception. Timestamp: ${lastObject.timestamp}`);
