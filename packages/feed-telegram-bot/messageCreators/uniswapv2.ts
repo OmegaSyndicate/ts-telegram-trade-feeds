@@ -1,5 +1,5 @@
 import { shortenAddress } from "./Radix-uniswap";
-import { generateDots } from "./Wise-stakes-uniswap";
+import { generateDots } from "./wise-stakes";
 
 export interface Message {
     transaction: {

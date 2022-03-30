@@ -1,5 +1,5 @@
 import { numWithCommas, shortenAddress, createEtherscanLink } from "./Radix-uniswap";
-import { generateDots } from "./Wise-stakes-uniswap";
+import { generateDots } from "./wise-stakes";
 export interface Message {
     amountDeft: string,
     amountDeftInUsd: string,

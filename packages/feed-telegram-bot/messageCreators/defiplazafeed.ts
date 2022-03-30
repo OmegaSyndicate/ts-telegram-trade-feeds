@@ -1,6 +1,6 @@
 import { Message } from './defiplaza';
 import { shortenAddress, createEtherscanLink, numWithCommas } from "./Radix-uniswap";
-import { generateDots } from "./Wise-stakes-uniswap";
+import { generateDots } from "./wise-stakes";
 
 export function createMessage(options: any, constants) {
     const gasFee = Number(options.transaction.gasLimit) * Number(options.transaction.gasPrice) / 1e18 * options.ethPriceUSD;

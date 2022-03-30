@@ -1,5 +1,5 @@
 import { shortenAddress, createEtherscanLink, numWithCommas } from "./Radix-uniswap";
-import { generateDots } from "./Wise-stakes-uniswap";
+import { generateDots } from "./wise-stakes";
 
 export interface Message {
     Burn: Type,

@@ -1,5 +1,5 @@
 import { createEtherscanLink, numWithCommas, shortenAddress } from "./Radix-uniswap"
-import { generateDots } from './Wise-stakes-uniswap';
+import { generateDots } from './wise-stakes';
 
 export interface Message {
     feedType: "withdraw" | "deposit",
