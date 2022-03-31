@@ -53,8 +53,8 @@ async function makeRequest(latest, logger) {
             .map(async (stake) => {
                 if(stake.startTx == '0x') {
                     while(true) {
-                        let { data: fullInfo } = await request("POST", wiseGraph, { query: createQuery(timestamp_gt, stake.id )});
-                        if(fullInfo.closeDay == null) {
+                        let { data: { stake: fullInfo } } = await request("POST", wiseGraph, { query: createQuery(timestamp_gt, stake.id )});
+                        if(!fullInfo || fullInfo.closeDay == null) {
                             await new Promise((r) => setTimeout(r, 5000));
                             continue;
                         }
@@ -62,16 +62,13 @@ async function makeRequest(latest, logger) {
                         // stake.lastScrapeDay = fullInfo.stake.lastScrapeDay
                         // stake.lockDays = fullInfo.stake.lockDays;
                         // stake.startDay = fullInfo.stake.startDay;
-                        return Object.assign({ ...stake, price }, fullInfo.data.stake);
+                        return Object.assign({ ...stake, price }, fullInfo);
                     }
                 }
             })
         )
     return tempReceived.data.stakes;
 }
-
-makeRequest(undefined, undefined)
-
 
 function createQuery(timestamp_gt: number, stakeID?: string) {
     return `query {
