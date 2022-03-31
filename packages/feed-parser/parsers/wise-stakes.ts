@@ -52,8 +52,18 @@ async function makeRequest(latest, logger) {
     tempReceived.data.stakes = await Promise.all(tempReceived.data.stakes.reverse()
             .map(async (stake) => {
                 if(stake.startTx == '0x') {
-                    let fullInfo = await request("POST", wiseGraph, { query: createQuery(timestamp_gt, stake.id )});
-                    return Object.assign({ ...stake, price }, fullInfo.data.stake);
+                    while(true) {
+                        let { data: fullInfo } = await request("POST", wiseGraph, { query: createQuery(timestamp_gt, stake.id )});
+                        if(fullInfo.closeDay == null) {
+                            await new Promise((r) => setTimeout(r, 5000));
+                            continue;
+                        }
+                        // stake.daiEquivalent = fullInfo.stake.daiEquivalent
+                        // stake.lastScrapeDay = fullInfo.stake.lastScrapeDay
+                        // stake.lockDays = fullInfo.stake.lockDays;
+                        // stake.startDay = fullInfo.stake.startDay;
+                        return Object.assign({ ...stake, price }, fullInfo.data.stake);
+                    }
                 }
             })
         )
