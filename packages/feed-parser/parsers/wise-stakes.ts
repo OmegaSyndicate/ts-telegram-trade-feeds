@@ -64,6 +64,8 @@ async function makeRequest(latest, logger) {
                         // stake.startDay = fullInfo.stake.startDay;
                         return Object.assign({ ...stake, price }, fullInfo);
                     }
+                } else {
+                    return { ...stake, price};
                 }
             })
         )
