@@ -52,7 +52,7 @@ async function makeRequest(stakeType: string, apiUrl, logger, latestSaved, lates
     } else {
         const lastObject = JSON.parse(String(latest));
         let lastString = searchString(stakeType, lastObject);
-        let tempReceived = await request("POST", apiUrl, { query: createBridgeQuery(stakeType, 1000, 0, lastObject.timestamp) }, logger);
+        let tempReceived = await request("POST", apiUrl, { query: createBridgeQuery(stakeType, 1000, 0, lastObject[`${stakeType}At`]) }, logger);
         console.log(tempReceived)
         if(tempReceived['errors']) {
             logger.error(tempReceived.errors);
