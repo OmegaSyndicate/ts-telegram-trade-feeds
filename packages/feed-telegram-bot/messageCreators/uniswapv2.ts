@@ -21,7 +21,8 @@ export interface Message {
       amount1In: string //'9337.32393',
       amount1Out: string //'0',
       amountUSD: string //'9334.281816012078000053795287812957',
-      to: string //'0xf07704777d6bc182bf2c67fbda48913169b84983',
+      to: string //'0xf07704777d6bc182bf2c67fbda48913169b84983', // contract
+      from: string
       feedType: 'sold' | 'buy'
 }
 
@@ -37,7 +38,7 @@ export function createMessage(options: Message, constants) {
     return `${options.feedType == "buy" ? "🚀" : "👹"} *1 ${constants.token} = ${Number(priceUSD).toFixed(getDoubleOffset(priceUSD))} ${pairTokenStable ? pairTokenSymbol : `USD (${priceByPairToken.toFixed(getDoubleOffset(priceByPairToken))} ${pairTokenSymbol})`}*\n` +
             `${options.feedType == "buy" ? "Bought" : "Sold"} *${numWithCommas((+amountCurrentToken).toFixed(getDoubleOffset(+amountCurrentToken)))} ${constants.token}* for *${numWithCommas((+amountPairToken).toFixed(getDoubleOffset(+amountPairToken)))} ${pairTokenSymbol}${pairTokenStable ? '' : ` (${numWithCommas(Math.ceil(+options.amountUSD))}$)`}* on Uniswap V2\n\n` +
             `${generateDots(options.amountUSD, constants, options.feedType == "buy" ? "🟢" : "🔴")}\n\n` +
-            `From address: [${shortenAddress(options.to)}](https://etherscan.io/address/${options.to})\n\n` +
+            `From address: [${shortenAddress(options.from)}](https://etherscan.io/address/${options.from})\n\n` +
             `🦄 [Uniswap V2](https://v2.info.uniswap.org/pair/${options.pair.id}) | 📶 [Tx Hash](https://etherscan.io/tx/${options.transaction.id}) | 📊 [Dextools](https://www.dextools.io/app/ether/pair-explorer/${options.pair.id}) | 💥 [Powered by Cerby Finance](https://cerby.fi)`
 }
 

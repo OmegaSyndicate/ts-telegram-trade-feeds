@@ -93,6 +93,7 @@ function createQuery(pairs: string[], timestamp_gt: number): string {
           amount1Out
           amountUSD
           to
+          from
         }
       }`.split(/ |\n/gm).filter(el => el).join(' '); // String compression
 }
