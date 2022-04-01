@@ -1,6 +1,4 @@
-import { shortenAddress } from "./Radix-uniswap";
-import { generateDots } from "./wise-stakes";
-import { getDoubleOffset, numWithCommas } from "./uniswapv2";
+import { getDoubleOffset, numWithCommas, CerbyFinance, ScanText, generateDots } from "./helpers";
 
 export interface Message {
     transaction: {
@@ -33,7 +31,7 @@ export function createMessage(options: Message, constants) {
 
     return `${options.feedType == "buy" ? "🚀" : "👹"} *1 ${constants.token} = ${Number(priceUSD).toFixed(getDoubleOffset(priceUSD))} ${pairTokenStable ? pairTokenSymbol : `USD (${priceByPairToken.toFixed(getDoubleOffset(priceByPairToken))} ${pairTokenSymbol})`}*\n` +
             `${options.feedType == "buy" ? "Bought" : "Sold"} *${numWithCommas((+amountCurrentToken).toFixed(getDoubleOffset(+amountCurrentToken)))} ${constants.token}* for *${numWithCommas((+amountPairToken).toFixed(getDoubleOffset(+amountPairToken)))} ${pairTokenSymbol}${pairTokenStable ? '' : ` (${numWithCommas(Math.ceil(+options.amountUSD))}$)`}* on Uniswap V3\n\n` +
-            `${generateDots(options.amountUSD, constants, options.feedType == "buy" ? "🟢" : "🔴")}\n\n` +
-            `From address: [${shortenAddress(options.origin)}](https://etherscan.io/address/${options.origin})\n\n` +
-            `🦄 [Uniswap V3](https://v3.info.uniswap.org/#/pools/${options.pool.id}) | 📶 [Tx Hash](https://etherscan.io/tx/${options.transaction.id}) | 📊 [Dextools](https://www.dextools.io/app/ether/pair-explorer/${options.pool.id}) | 💥 [Powered by Cerby Finance](https://cerby.fi)`
+            `${generateDots(+options.amountUSD, constants, options.feedType == "buy" ? "🟢" : "🔴")}\n\n` +
+            `From address: ${ScanText.createScanText(ScanText.ScanChain.ETH, ScanText.ScanType.account, options.origin)}\n\n` +
+            `🦄 [Uniswap V3](https://v3.info.uniswap.org/#/pools/${options.pool.id}) | ${ScanText.createScanText(ScanText.ScanChain.ETH, ScanText.ScanType.tx, options.transaction.id)} | 📊 [Dextools](https://www.dextools.io/app/ether/pair-explorer/${options.pool.id}) | ${CerbyFinance}`
 }

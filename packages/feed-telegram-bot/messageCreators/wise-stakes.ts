@@ -1,5 +1,5 @@
 import { Logger } from "../../feed-parser/helpers/logger";
-import { numWithCommas, shortenAddress, createEtherscanLink } from './Radix-uniswap';
+import { numWithCommas, ScanText, CerbyFinance, fromWei, generateDots, getDate } from './helpers';
 
 export interface Message {
     // feedType: string,
@@ -46,43 +46,6 @@ export interface Message {
     feedType: "stakeStarted" | "stakeCompleted" | "stakeCanceled"
 }
 
-export function generateDots(amountInUsd, constants, boundEmoji) {
-    let dots = amountInUsd < 2*constants.USDInterval? 1: amountInUsd / constants.USDInterval - 1;
-    dots = dots > 1000 ? 1000 : dots;
-    let message = "";
-    for (let i = 0; i < dots; i++)
-        message += boundEmoji;
-    return message;
-}
-
-export function dateFromDay(day: number) {
-    var date = new Date(1604966400000); // initialize a date in `year-01-01`
-  
-    date.setDate(date.getDate() + day);
-
-    return date;
-}
-
-export function getDate(day: number, endTimestamp: number | string = 0) {
-    let date_1 = new Date(endTimestamp ? +endTimestamp - day * 86400 * 1e3 : 0);
-    let date_2 = new Date(+date_1 + (day * 86400 * 1e3));
-    let date2_UTC = new Date(Date.UTC(date_2.getUTCFullYear(), date_2.getUTCMonth(), date_2.getUTCDate()));
-    let date1_UTC = new Date(Date.UTC(date_1.getUTCFullYear(), date_1.getUTCMonth(), date_1.getUTCDate()));
-
-    let days = (+date2_UTC - +date1_UTC) / (86400 * 1e3);
-    console.log(days);
-    if(Math.floor(days / 365)) {
-        return `(${(days / 365).toFixed(1)} years) `;
-    } else if(Math.floor(days / 30)) {
-        return `(${(days / 30).toFixed(1)} months) `;
-    } else {
-        return '';
-    }
-}
-
-export function fromWei(num: string | number): number {
-    return +num / 1e18
-}
 
 export function createMessage(options: Message, constants, logger: Logger) {
     let emoji;
@@ -118,6 +81,6 @@ export function createMessage(options: Message, constants, logger: Logger) {
      return `${emoji} ${stakeType} of *${numWithCommas(Math.floor(fromWei(options.principal) * 1000) / 1000)} WISE* (${numWithCommas(Math.floor(fromWei(options.principal) * options.price))}$) ${options.feedType == "stakeStarted" ? "for" : "after"} ${days} days ${getDate(days, options.timestamp)}long\n\n` +
             `${generateDots(fromWei(options.principal) * options.price, constants, boundEmoji)}\n\n` +
             additionalInfo +
-            `From address: [${shortenAddress(options.staker)}](${createEtherscanLink("address", options.staker)})\n\n` +
-            `📶 [Tx Hash](${createEtherscanLink("tx", options.feedType == 'stakeStarted' ? options.startTx : options.endTx)}) | 💥 [Powered by Cerby Finance](https://cerby.fi)`
+            `From address: ${ScanText.createScanText(ScanText.ScanChain.ETH, ScanText.ScanType.account, options.staker)}\n\n` +
+            `${ScanText.createScanText(ScanText.ScanChain.ETH, ScanText.ScanType.tx, options.feedType == 'stakeStarted' ? options.startTx : options.endTx)} | ${CerbyFinance}`
 }

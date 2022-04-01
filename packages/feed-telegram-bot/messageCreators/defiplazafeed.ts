@@ -1,6 +1,4 @@
-import { Message } from './defiplaza';
-import { shortenAddress, createEtherscanLink, numWithCommas } from "./Radix-uniswap";
-import { generateDots } from "./wise-stakes";
+import { generateDots, ScanText, CerbyFinance, numWithCommas } from "./helpers";
 
 export function createMessage(options: any, constants) {
     const gasFee = Number(options.transaction.gasLimit) * Number(options.transaction.gasPrice) / 1e18 * options.ethPriceUSD;
@@ -13,8 +11,8 @@ export function createMessage(options: any, constants) {
         return `${options.type == "Bought" ? "🚀" : "👹"} *1 ${constants.token.toUpperCase()} = ${dfpInUsd.toFixed(4)} USD*\n` +
                 `${options.type} *${numWithCommas(Math.floor(dfpAmount * 1000) / 1000)} ${constants.token.toUpperCase()}* for *${numWithCommas(Math.floor(otherAmount * 1000) / 1000)} ${otherName}* on DefiPlaza (Gas Fee: $${numWithCommas(Math.ceil(gasFee))})\n\n` +
                 `${generateDots(options.swapUSD, constants, options.type == "Bought" ? "🟢" : "🔴" )}\n\n` +
-                `From address: [${shortenAddress(options.sender)}](${createEtherscanLink("address", options.sender)})\n\n` +
-                `🏛 [Defi Plaza](https://defiplaza.net/swap) | 📶 [Tx Hash](${createEtherscanLink("tx", options.id)}) | 📊 [Dextools](https://www.dextools.io/app/ether/pair-explorer/0x820d74078eb4c94e24ef0bcc8ccf848a238f473e) | 💥 [Powered by Cerby Finance](https://cerby.fi)`
+                `From address: ${ScanText.createScanText(ScanText.ScanChain.ETH, ScanText.ScanType.account, options.sender)}\n\n` +
+                `🏛 [Defi Plaza](https://defiplaza.net/swap) | ${ScanText.createScanText(ScanText.ScanChain.ETH, ScanText.ScanType.tx, options.id)} | 📊 [Dextools](https://www.dextools.io/app/ether/pair-explorer/0x820d74078eb4c94e24ef0bcc8ccf848a238f473e) | ${CerbyFinance}`
     } else {
         let symbol, price;
         if(~options.inputToken.symbol.toLowerCase().indexOf('usd') || ~options.inputToken.symbol.toLowerCase().indexOf('dai')) {
@@ -27,7 +25,7 @@ export function createMessage(options: any, constants) {
         return `🔄 *1 ${symbol.toUpperCase()} = ${(+price).toFixed(4)} USD*\n` +
                `Swapped *${numWithCommas(Math.floor(+options.inputAmount * 1000) / 1000)} ${options.inputToken.symbol.toUpperCase()}* for *${numWithCommas(Math.floor(+options.outputAmount * 1000) / 1000)} ${options.outputToken.symbol.toUpperCase()}* on DefiPlaza (Gas Fee: $${numWithCommas(Math.ceil(gasFee))})\n\n` +
                 `${generateDots(options.swapUSD, constants, '🟠')}\n\n` +
-                `From address: [${shortenAddress(options.sender)}](${createEtherscanLink("address", options.sender)})\n\n` +
-                `🏛 [Defi Plaza](https://defiplaza.net/swap) | 📶 [Tx Hash](${createEtherscanLink("tx", options.id)}) | 💥 [Powered by Cerby Finance](https://cerby.fi)`
+                `From address: ${ScanText.createScanText(ScanText.ScanChain.ETH, ScanText.ScanType.account, options.sender)}\n\n` +
+                `🏛 [Defi Plaza](https://defiplaza.net/swap) | ${ScanText.createScanText(ScanText.ScanChain.ETH, ScanText.ScanType.tx, options.id)} | ${CerbyFinance}`
     }
 }

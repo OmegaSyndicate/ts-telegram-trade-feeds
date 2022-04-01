@@ -1,4 +1,4 @@
-import { numWithCommas, generateDots } from "./Radix-uniswap"
+import { generateDots, CerbyFinance, numWithCommas } from "./helpers"
 
 export interface Message {
     id: number,
@@ -17,6 +17,6 @@ export function createMessage(options: Message, constants) {
     let swapInUsd = options.anotherPrice ? (options.anotherPrice * +options.price) * +options.amount : +options.amount * +options.price
     return `${options.side == "buy" ? "🚀" : "👹"} *1 ${constants.token} = ${options.anotherPrice ? `${(options.anotherPrice * +options.price).toFixed(constants.priceDigit)} USD (${(+options.price).toFixed(6)} ${symbol})` : `${(+options.price).toFixed(constants.priceDigit)} ${symbol}`}*\n`
     +   `${options.side == "buy" ? "Bought" : "Sold"} *${numWithCommas(Math.ceil(+options.amount))} ${constants.token}* for *${options.anotherPrice ? (+options.amount * +options.price).toFixed(4) : numWithCommas(Math.ceil(+options.amount * +options.price))} ${symbol}${options.anotherPrice ? ` (${numWithCommas(Math.ceil(swapInUsd))}$)` : ''}* on Gate\n\n`
-    +   `${generateDots({ feedType: (options.side == "buy" ? "uniswapBuy" : options.side), amountRadixInUsd: swapInUsd}, constants)}\n\n`
-    +   `${constants.mainLink} | 🚪 [Gate.io](${constants.tradeLinks[symbol]}) | 💥 [Powered by Cerby Finance](https://cerby.fi)`
+    +   `${generateDots(swapInUsd, constants, options.side == "buy" ? "🟢" : "🔴")}`
+    +   `${constants.mainLink} | 🚪 [Gate.io](${constants.tradeLinks[symbol]}) | ${CerbyFinance}`
 }

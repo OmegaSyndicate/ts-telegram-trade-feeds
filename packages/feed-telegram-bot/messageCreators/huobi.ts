@@ -1,4 +1,4 @@
-import { numWithCommas, generateDots } from "./Radix-uniswap"
+import { numWithCommas, generateDots, CerbyFinance } from "./helpers"
 
 export interface Message {
     id: number,
@@ -13,6 +13,6 @@ export function createMessage(options: Message, constants) {
     let symbol = constants.currencypair;
     return `${options.direction == "buy" ? "🚀" : "👹"} *1 ${constants.token} = ${(+options.price).toFixed(4)} ${symbol}*\n`
     +   `${options.direction == "buy" ? "Bought" : "Sold"} *${numWithCommas(Math.ceil(+options.amount))} ${constants.token}* for *${numWithCommas(Math.ceil(+options.amount * +options.price))} ${symbol}* on Huobi\n\n`
-    +   `${generateDots({ feedType: (options.direction == "buy" ? "uniswapBuy" : options.direction), amountRadixInUsd: +options.amount * +options.price}, constants)}\n\n`
-    +   `${constants.mainLink} | 🔥 [Huobi](${constants.tradeLink}) | 💥 [Powered by Cerby Finance](https://cerby.fi)`
+    +   `${generateDots(+options.amount * +options.price, constants, options.direction == "buy" ? "🟢" : "🔴")}`
+    +   `${constants.mainLink} | 🔥 [Huobi](${constants.tradeLink}) | ${CerbyFinance}`
 }

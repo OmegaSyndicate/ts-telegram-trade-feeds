@@ -1,5 +1,4 @@
-import { shortenAddress } from "./Radix-uniswap";
-import { generateDots } from "./wise-stakes";
+import { numWithCommas, generateDots, ScanText, CerbyFinance, getDoubleOffset } from "./helpers";
 
 export interface Message {
     transaction: {
@@ -37,25 +36,8 @@ export function createMessage(options: Message, constants) {
 
     return `${options.feedType == "buy" ? "🚀" : "👹"} *1 ${constants.token} = ${Number(priceUSD).toFixed(getDoubleOffset(priceUSD))} ${pairTokenStable ? pairTokenSymbol : `USD (${priceByPairToken.toFixed(getDoubleOffset(priceByPairToken))} ${pairTokenSymbol})`}*\n` +
             `${options.feedType == "buy" ? "Bought" : "Sold"} *${numWithCommas((+amountCurrentToken).toFixed(getDoubleOffset(+amountCurrentToken)))} ${constants.token}* for *${numWithCommas((+amountPairToken).toFixed(getDoubleOffset(+amountPairToken)))} ${pairTokenSymbol}${pairTokenStable ? '' : ` (${numWithCommas(Math.ceil(+options.amountUSD))}$)`}* on Uniswap V2\n\n` +
-            `${generateDots(options.amountUSD, constants, options.feedType == "buy" ? "🟢" : "🔴")}\n\n` +
-            `From address: [${shortenAddress(options.from)}](https://etherscan.io/address/${options.from})\n\n` +
-            `🦄 [Uniswap V2](https://v2.info.uniswap.org/pair/${options.pair.id}) | 📶 [Tx Hash](https://etherscan.io/tx/${options.transaction.id}) | 📊 [Dextools](https://www.dextools.io/app/ether/pair-explorer/${options.pair.id}) | 💥 [Powered by Cerby Finance](https://cerby.fi)`
+            `${generateDots(+options.amountUSD, constants, options.feedType == "buy" ? "🟢" : "🔴")}\n\n` +
+            `From address: ${ScanText.createScanText(ScanText.ScanChain.ETH, ScanText.ScanType.account, options.from)}\n\n` +
+            `🦄 [Uniswap V2](https://v2.info.uniswap.org/pair/${options.pair.id}) | ${ScanText.createScanText(ScanText.ScanChain.ETH, ScanText.ScanType.tx, options.transaction.id)} | 📊 [Dextools](https://www.dextools.io/app/ether/pair-explorer/${options.pair.id}) | ${CerbyFinance}`
 }
 
-export function getDoubleOffset(num: number) {
-    if(num < 10) {
-        let numString = String(num).slice(2);
-        let offset = 0;
-        for(; numString[offset] == '0'; offset++) {}
-        return offset + 4;
-    } else if(num < 100) {
-        return 2;
-    } else {
-        return 0;
-    }
-}
-
-export function numWithCommas(number) {
-    let strNum = String(number);
-    return Number(number).toFixed(0).toString().replace(/\B(?=(\d{3})+(?!\d))/g, ",") + (~strNum.indexOf('.') ? strNum.slice(strNum.indexOf('.')) : '');
-}

@@ -18,7 +18,7 @@
 //     amount: number;
 // }
 
-import { numWithCommas, generateDots } from "./Radix-uniswap"
+import { numWithCommas, generateDots, CerbyFinance } from "./helpers"
 
 export interface Message {
     type: "Bought" | "Sold";
@@ -31,6 +31,6 @@ export interface Message {
 export function createMessage(options: Message, constants) {
     return `${options.type == "Bought" ? "🚀" : "👹"} *1 ${constants.token.substring(1,4)} = ${options.price.toFixed(4)} ${constants.token.substring(4)}T*\n`
     +   `${options.type} *${numWithCommas(Math.ceil(options.amount))} ${constants.token.substring(1,4)}* for *${numWithCommas(Math.ceil(options.amount * options.price))} ${constants.token.substring(4)}T* on Bitfinex\n\n`
-    +   `${generateDots({ feedType: (options.type == "Bought" ? "uniswapBuy" : options.type), amountRadixInUsd: options.amount * options.price}, constants)}\n\n`
-    +   `💵 [Bitfinex](https://trading.bitfinex.com/t/XRDUSD?type=exchange) | 💥 [Powered by Cerby Finance](https://cerby.fi)`
+    +   `${generateDots(options.amount * options.price, constants, options.type == "Bought" ? "🟢" : "🔴")}\n\n`
+    +   `💵 [Bitfinex](https://trading.bitfinex.com/t/XRDUSD?type=exchange) | ${CerbyFinance}`
 }

@@ -1,5 +1,4 @@
-import { numWithCommas, shortenAddress, createEtherscanLink } from "./Radix-uniswap";
-import { generateDots, getDate } from "./wise-stakes";
+import { numWithCommas, generateDots, ScanText, CerbyFinance, getDate } from "./helpers";
 
 export interface Message {
     id: string,
@@ -22,7 +21,7 @@ export interface Message {
 	blockNumber: string,
 	gasPrice: string,
 	gasUsed: string,
-    feedType: string,
+    feedType: "stakeStarted" | "stakeCanceled" | "stakeCompleted",
     transactionFeeInUsd: number,
     roi: string,
     deftInUsd: string,
@@ -36,6 +35,26 @@ export async function createMessage(options: Message, constants, logger) {
     const stakeType = [options.feedType.slice(5), options.feedType.slice(0, 5)].join(' ');
     // const ROI = -1// (((Number(options.stakedAmount) - Number(options.penalty)) / options.amountWise) * 100).toFixed(2);
     let days;
+    const scanByChain = new ScanText.generateScanText();
+    switch(constants.pair) {
+        case "Eth":
+            scanByChain.setChain(ScanText.ScanChain.ETH);
+            break;
+        case "Matic":
+            scanByChain.setChain(ScanText.ScanChain.Polygon);
+            break;
+        case "Bnb":
+            scanByChain.setChain(ScanText.ScanChain.BSC);
+            break;
+        case "Avax":
+            scanByChain.setChain(ScanText.ScanChain.Avax);
+            break;
+        case "Ftm":
+            scanByChain.setChain(ScanText.ScanChain.FTM);
+            break;
+        default:
+            throw "Error, symbol not found!";
+    }
     
     switch(options.feedType) {
         case "stakeCanceled":
@@ -64,6 +83,6 @@ export async function createMessage(options: Message, constants, logger) {
      return `${emoji} ${stakeType} of *${numWithCommas(Math.floor(+options.stakedAmount * 1000) / 1000)} CERBY* (${numWithCommas(Math.floor(+options.stakedAmount * +options.deftInUsd))}$) ${options.feedType == "stakeStarted" ? "for" : "after"} ${days} days ${getDate(days, +options.timestamp * 1e3)}long on ${constants.token} (Gas Fee: $${numWithCommas(Math.ceil(options.transactionFeeInUsd))})\n\n` +
             `${generateDots(+options.stakedAmount * +options.deftInUsd, constants, boundEmoji)}\n\n` +
             additionalInfo +
-            `From address: [${shortenAddress(options.owner.id)}](${constants.scanURL}address/${options.owner.id})\n\n` +
-            `🥩 [Staking](https://app.cerby.fi/staking) | 📶 [Tx Hash](${constants.scanURL}tx/${options.feedType == "stakeStarted" ? options.startTx : options.endTx}) | 💥 [Powered by Cerby Finance](https://cerby.fi)`
+            `From address: ${scanByChain.createLink(ScanText.ScanType.account, options.owner.id)}\n\n` +
+            `🥩 [Staking](https://app.cerby.fi/staking) | ${scanByChain.createLink(ScanText.ScanType.tx, options.feedType == "stakeStarted" ? options.startTx : options.endTx)} | ${CerbyFinance}`
 }
