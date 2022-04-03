@@ -35,6 +35,14 @@ interface bitmartTransaction {
     type: "sell" | "buy"
 }
 
+interface hooTransaction {
+    amount: string //'0.918',
+    price: string //'2.04',
+    side: -1 | 1, // -1 — sell, 1 - buy. if(~side) { /* buy */ } else { /* sell */ }
+    time: number // 1574942822160,
+    volume: string //'0.45'
+}
+
 interface Output {
     type: "sell" | "buy",
     vsSymbol: string,
@@ -82,6 +90,10 @@ export function parser(message: Buffer, logger, settings): Message {
         case "zb":
             msg.price = +msg.price;
             msg.inTokens = +msg.amount;
+            return msg;
+        case "hoo":
+            msg.type = ~msg.side ? 'buy' : 'sell';
+            msg.inTokens = msg.volume;
             return msg;
         default:
             logger.error(`Error from cex parser. This type of parser is not supported: ${settings.type}`);
