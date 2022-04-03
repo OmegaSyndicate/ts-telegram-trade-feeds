@@ -64,7 +64,7 @@ export namespace ScanText {
                     return `etherscan.io`;
             }
         })();
-        return ScanType.tx ? "📶 [Tx Hash]" : `[${shortenAddress(address)}]` +
+        return (type == ScanType.tx ? "📶 [Tx Hash]" : `[${shortenAddress(address)}]`) +
             `(https://${ScanHost}/${
                 type == ScanType.account
                 ? (chain == ScanChain.AlephZeroSubscan ? "account" : "address")
