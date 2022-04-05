@@ -6,7 +6,7 @@
 // New version
 export function numWithCommas(number: number | string) {
     let strNum = String(number);
-    return Number(number).toFixed(0).toString().replace(/\B(?=(\d{3})+(?!\d))/g, ",") + (~strNum.indexOf('.') ? strNum.slice(strNum.indexOf('.')) : '');
+    return Math.floor(+number).toString().replace(/\B(?=(\d{3})+(?!\d))/g, ",") + (~strNum.indexOf('.') ? strNum.slice(strNum.indexOf('.')) : '');
 }
 
 function shortenAddress(address: string) {
