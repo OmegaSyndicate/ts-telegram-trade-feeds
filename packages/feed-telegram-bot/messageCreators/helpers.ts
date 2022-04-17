@@ -10,7 +10,7 @@ export function numWithCommas(number: number | string) {
 }
 
 function shortenAddress(address: string) {
-    switch(address) {
+    switch(address.toLowerCase()) {
         case "0x8149C0a6f5b5417d30F70e00a05d8D15CF471853".toLowerCase():
             return "Cerby Stablecoin Reserve"
         case "0x72aCC602f185692b80d66f933Bb679b04aD4583d".toLowerCase():
@@ -23,6 +23,8 @@ function shortenAddress(address: string) {
             return "Cerby Team #3";
         case "0xBD50733cE43871F80AdFb344aB6F7C43B666763F".toLowerCase():
             return "Cerby Team #4";
+        case "5FsWP1GxpzT11xyFBojKpE75pzp54ESDA6BYbRMPJ2nsCZE5".toLowerCase():
+            return "GateColdWallet";
     }
     return address.substring(0, 6) + "..." + address.substring(address.length - 4);
 }
