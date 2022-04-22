@@ -26,6 +26,10 @@ export interface Message {
 }
 
 export function createMessage(options: Message, constants) {
+    if(constants.moved) {
+      return `❗️ Channel is moved to @WiseTokenFeed\n` +
+            `❗️ This channel will be removed by 22 May 2022`
+    }
     const currentTokenNum: 0 | 1 = options.pair.token0.symbol == constants.token ? 0 : 1;
     const priceByPairToken = +options.pair[`token${+!currentTokenNum}Price`];
     const amountCurrentToken = options.feedType == 'buy' ? options[`amount${currentTokenNum}Out`] : options[`amount${currentTokenNum}In`];

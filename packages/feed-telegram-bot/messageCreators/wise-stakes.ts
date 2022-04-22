@@ -48,6 +48,10 @@ export interface Message {
 
 
 export function createMessage(options: Message, constants, logger: Logger) {
+    if(constants.moved) {
+        return `❗️ Channel is moved to @WiseTokenFeed\n` +
+               `❗️ This channel will be removed by 22 May 2022`
+    }
     let emoji;
     let boundEmoji;
     let additionalInfo = '';
