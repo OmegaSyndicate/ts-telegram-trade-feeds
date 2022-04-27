@@ -26,7 +26,7 @@ function shortenAddress(address: string) {
         case "5FsWP1GxpzT11xyFBojKpE75pzp54ESDA6BYbRMPJ2nsCZE5".toLowerCase():
             return "GateColdWallet";
     }
-    return address.substring(0, 6) + "..." + address.substring(address.length - 4);
+    return address.substring(0, 6) + "..." + address.substring(address.length - 5);
 }
 
 export function createEtherscanLink(type: "address" | "tx", address: string) {
