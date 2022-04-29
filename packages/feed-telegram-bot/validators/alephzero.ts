@@ -7,5 +7,5 @@ export function validate(config, msg: Message): boolean {
     ) {
         return false; 
     }
-    return +msg.amount >= config.minALEPH;
+    return (config.minALEPH ? +msg.amount >= config.minALEPH : true) && (config.minUSD ? +msg.amount * +msg.price >= config.minUSD : true);
 }
