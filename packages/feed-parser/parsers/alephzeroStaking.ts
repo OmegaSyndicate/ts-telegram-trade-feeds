@@ -3,6 +3,7 @@ import { request } from "../helpers/request";
 const apiURL = "https://alephzero.api.subscan.io/";
 const apiKey = "03f7cf1c0d0741aed2be3cfb53855f9c";
 
+
 export async function* sync(latestMessage, settings, logger) {
     let latestSaved, data;
     try {
@@ -15,12 +16,27 @@ export async function* sync(latestMessage, settings, logger) {
                 await new Promise((resolve) => setTimeout(resolve, 60000));
                 throw new Error("The received last saved transaction from kafka does not match the one saved in the current instance.");
             }
-            const bond = (await makeRequest('bond', logger)) as stake[];
-            const bond_extra = (await makeRequest('bond_extra', logger)) as extrastake[];
+
+            const bond = await makeRequest('bond', logger) as stake[],
+                  bond_extra = await makeRequest('bond_extra', logger) as extrastake[],
+                  rebond = await makeRequest('rebond', logger) as extrastake[]
+
+            // API RATE LIMITED
+            // type bonds = [stake[], extrastake[], extrastake[]]
+            // const [bond, bond_extra, rebond]: bonds = await Promise.all([
+            //     makeRequest('bond', logger) as Promise<stake[]>,
+            //     makeRequest('bond_extra', logger) as Promise<extrastake[]>,
+            //     makeRequest('rebond', logger) as Promise<extrastake[]>
+            // ])
+
             yield data = (await normalization(
-                mergeTransactions(bond, bond_extra, latestSaved),
-                latest ? JSON.parse(String(latest)).extrinsic_index : undefined
+                mergeTransactions(
+                    mergeTransactions(bond, bond_extra, latestSaved) as stake[],
+                    rebond, latestSaved
+                ),
+                latest ? JSON.parse(String(latest)).extrinsic_index : '0'
             )).map(t => JSON.stringify(t));
+
             if(data.length) {
                 latestSaved = JSON.stringify(data.slice(-1));
             }
@@ -32,14 +48,14 @@ export async function* sync(latestMessage, settings, logger) {
     }
 }
 
-export async function makeRequest(type: 'bond_extra' | 'bond', logger?): Promise<stake[] | extrastake[]> {
+export async function makeRequest(type: 'bond_extra' | 'bond' | 'rebond', logger?): Promise<stake[] | extrastake[]> {
     const response = await request("POST", apiURL + 'api/scan/extrinsics', {
         data_raw: `{ "row": 100, "page": 0, "module": "staking", "call": "${type}"}`,
         headers: {
             "Content-Type": "application/json",
             "X-API-Key": apiKey
         }
-    });
+    }, logger);
     if(response.code != 0) {
         throw response;
     }
@@ -54,7 +70,6 @@ export async function normalization(extrs: ReturnType<typeof mergeTransactions>,
             vs_currencies: "usd"
         }}))['aleph-zero'].usd;
         return extrinsics.map((extrinsic: stake | extrastake) => {
-            console.log(extrinsic);
             extrinsic.feedType = "stakeStarted";
             extrinsic.price = price;
             extrinsic.amount = 
@@ -109,7 +124,7 @@ interface extrastake {
     block_timestamp: number // 1651415980,
     block_num: number //14872563,
     extrinsic_index: string //'14872563-1',
-    call_module_function: 'bond_extra',
+    call_module_function: 'bond_extra' | 'rebond',
     call_module: 'staking',
     params: string //'[{"name":"max_additional","type":"compact\\u003cU128\\u003e","type_name":"BalanceOf","value":"4850000000000000"}]',
     account_id: string //'5F9qHWiP4ZbiJsbt2QHaHGyNqAQUaU43J8J9SCaNTop9MypN',
