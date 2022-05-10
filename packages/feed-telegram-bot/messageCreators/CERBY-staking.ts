@@ -32,7 +32,6 @@ export async function createMessage(options: Message, constants, logger) {
     let emoji;
     let boundEmoji;
     let additionalInfo = '';
-    const stakeType = [options.feedType.slice(5), options.feedType.slice(0, 5)].join(' ');
     // const ROI = -1// (((Number(options.stakedAmount) - Number(options.penalty)) / options.amountWise) * 100).toFixed(2);
     let days;
     const scanByChain = new ScanText.generateScanText();
@@ -55,19 +54,30 @@ export async function createMessage(options: Message, constants, logger) {
         default:
             throw "Error, symbol not found!";
     }
+
+    let earlyOrLate: string | undefined = undefined; 
     
     switch(options.feedType) {
         case "stakeCanceled":
             emoji = "📕";
             boundEmoji = "⚫️"
-            additionalInfo = `🚫 Penalty: ${numWithCommas(Math.ceil(+options.penalty))} CERBY (${numWithCommas(Math.ceil((Math.abs(options.rewardAmount) * +options.deftInUsd) * 1e3) / 1e3)}$)\n`
+            const startDay = +options.startDay,
+                lockDays = +options.lockDays,
+                completedDate = 1635465600000 + (startDay + lockDays) * 0x5265c00;
+            if(completedDate <= Date.now()) {
+                earlyOrLate = '*late*';
+            } else {
+                earlyOrLate = '*early*';
+            }
+            additionalInfo = `💰 Reward: ${numWithCommas(Math.ceil(+options.interest))} CERBY (${numWithCommas(Math.ceil((Math.abs(+options.interest) * +options.deftInUsd) * 1e2) / 1e2)}$)\n`
+                           + `🚫 Penalty: ${numWithCommas(Math.ceil(+options.penalty))} CERBY (${numWithCommas(Math.ceil((Math.abs(options.rewardAmount) * +options.deftInUsd) * 1e2) / 1e2)}$)\n`
                            + `📉 ROI: ${Math.ceil(+options.roi * 100) / 100}%\n\n`;
             days = +options.endDay - +options.startDay + 1
             break;
         case "stakeCompleted":
             emoji = "📗"
             boundEmoji = "🟣"
-            additionalInfo = `${options.rewardAmount > 0 ? '💰 Reward' : '🚫 Penalty'}: ${numWithCommas(Math.ceil(Math.abs(options.rewardAmount)))} CERBY (${numWithCommas(Math.ceil((Math.abs(options.rewardAmount) * +options.deftInUsd) * 1e3) / 1e3)}$)\n` +
+            additionalInfo = `${options.rewardAmount > 0 ? '💰 Reward' : '🚫 Penalty'}: ${numWithCommas(Math.ceil(Math.abs(options.rewardAmount)))} CERBY (${numWithCommas(Math.ceil((Math.abs(options.rewardAmount) * +options.deftInUsd) * 1e2) / 1e2)}$)\n` +
                              `📉 ROI: ${Math.ceil(+options.roi * 100) / 100}%\n\n`;
             days = +options.endDay - +options.startDay + 1;
             break;
@@ -80,7 +90,8 @@ export async function createMessage(options: Message, constants, logger) {
             logger.error(`No bid found.\nReceived data: ${JSON.stringify(options)}`)
             throw 'error no bid';
     }
-     return `${emoji} ${stakeType} of *${numWithCommas(Math.floor(+options.stakedAmount * 1000) / 1000)} CERBY* (${numWithCommas(Math.floor(+options.stakedAmount * +options.deftInUsd))}$) ${options.feedType == "stakeStarted" ? "for" : "after"} ${days} days ${getDate(days, +options.timestamp * 1e3)}long on ${constants.token} (Gas Fee: $${numWithCommas(Math.ceil(options.transactionFeeInUsd))})\n\n` +
+    const stakeType = [options.feedType.slice(5), earlyOrLate, options.feedType.slice(0, 5)].filter(t => t).join(' ');
+    return `${emoji} ${stakeType} of *${numWithCommas(Math.floor(+options.stakedAmount * 100) / 100)} CERBY* (${numWithCommas(Math.floor(+options.stakedAmount * +options.deftInUsd))}$) ${options.feedType == "stakeStarted" ? "for" : "after"} ${days} days ${getDate(days, +options.timestamp * 1e3)}long on ${constants.token} (Gas Fee: $${numWithCommas(Math.ceil(options.transactionFeeInUsd))})\n\n` +
             `${generateDots(+options.stakedAmount * +options.deftInUsd, constants, boundEmoji)}\n\n` +
             additionalInfo +
             `From address: ${scanByChain.createLink(ScanText.ScanType.account, options.owner.id)}\n\n` +
