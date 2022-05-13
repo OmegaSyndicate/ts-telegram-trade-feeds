@@ -23,6 +23,8 @@ function shortenAddress(address: string) {
             return "Cerby Team #3";
         case "0xBD50733cE43871F80AdFb344aB6F7C43B666763F".toLowerCase():
             return "Cerby Team #4";
+        case "0x9980a0447456b5cdce209D7dC94820FF15600022".toLowerCase():
+            return "BridgeFeesWallet";
         case "5FsWP1GxpzT11xyFBojKpE75pzp54ESDA6BYbRMPJ2nsCZE5".toLowerCase():
             return "GateColdWallet";
     }
