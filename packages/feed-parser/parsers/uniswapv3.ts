@@ -43,7 +43,7 @@ async function makeRequest(token: string, tokenHash: string, latest, logger) {
         return;
     }
 
-    return mergeTransactions(tempReceived.data, token, latest);
+    return mergeTransactions(tempReceived.data, token, latest, logger);
 }
 
 interface receivedType {
@@ -51,7 +51,7 @@ interface receivedType {
     swapAs1: Array<any>
 }
 
-function mergeTransactions(received: receivedType, token: string, latestSaved) {
+function mergeTransactions(received: receivedType, token: string, latestSaved, logger) {
     let i, j;
     i = j = 0;
     let n = received.swapAs0.length;
@@ -76,10 +76,15 @@ function mergeTransactions(received: receivedType, token: string, latestSaved) {
         const latestTHash = JSON.parse(latestSaved).id;
         result.forEach((transaction) => {
             if(transaction.id == latestTHash) {
-                throw new Error("Duplicate transaction found during merge.\n"
-                                + `latestSaved: ${latestSaved}`
-                                + `received: ${JSON.stringify(received)}`
-                                + `with merge: ${JSON.stringify(result)}`);
+                if(result.length > 5) {
+                    result = result.slice(-1);
+                    logger.warn("Auto-correction after a duplicate transaction was found, 5 transactions were missed. This could be due to chain reorg");
+                } else {
+                    throw new Error("Duplicate transaction found during merge.\n"
+                                    + `latestSaved: ${latestSaved}`
+                                    + `received: ${JSON.stringify(received)}`
+                                    + `with merge: ${JSON.stringify(result)}`);
+                }
             }
         })
     }
