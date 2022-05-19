@@ -3,9 +3,19 @@ import { request } from "../helpers/request";
 const apiURL = "https://alephzero.api.subscan.io/";
 const apiKey = "03f7cf1c0d0741aed2be3cfb53855f9c";
 
+let lock = false;
+let callsPerSec = 0;
+let pleaseRestart = false;
+
+setInterval(() => {
+    callsPerSec = 0;
+}, 1000);
+
 
 export async function* sync(latestMessage, settings, logger) {
     let latestSaved, data;
+    let queue: Transaction[] = [];
+    let pastQueue: Transaction[] = [];
     try {
         while(true) {
             const latest: stake | undefined = (await latestMessage())?.value;
@@ -28,10 +38,26 @@ export async function* sync(latestMessage, settings, logger) {
             //     makeRequest('rebond', logger) as Promise<extrastake[]>
             // ])
 
-            yield data = (await normalization(
-                mergeTransactions(unbond, withdraw_unbonded, latestSaved),
-                latest ? JSON.parse(String(latest)).extrinsic_index : '0'
-            )).map(t => JSON.stringify(t));
+            if(queue.length) {
+                const received = (await normalization(
+                    mergeTransactions(unbond, withdraw_unbonded),
+                    queue.slice(-1)[0].extrinsic_index
+                ))
+                queue.push.apply(queue, received); // concat because it creates a new array, and the queue manager will have a link to the old one
+            } else {
+                const received = (await normalization(
+                    mergeTransactions(unbond, withdraw_unbonded, latestSaved),
+                    latest ? JSON.parse(String(latest)).extrinsic_index : '0'
+                ))
+                queue.push.apply(queue, received);
+            }
+
+            if(!lock) {
+                queueManager(queue, pastQueue, logger);
+            }
+
+            yield data = pastQueue.map(t => JSON.stringify(t));
+            pastQueue.length = 0;
 
             if(data.length) {
                 latestSaved = JSON.stringify(data.slice(-1));
@@ -44,7 +70,51 @@ export async function* sync(latestMessage, settings, logger) {
     }
 }
 
+async function awaiter(): Promise<void> {
+    while(callsPerSec >= 4) {
+        await new Promise((r) => setTimeout(r, 250));
+    }
+}
+
+async function queueManager(queue: Transaction[], pastQueue: Transaction[], logger): Promise<void> {
+    if(lock) {
+        throw new Error("The queue manager can only be started in one instance!");
+    }
+    lock = true;
+    while(queue.length) {
+        // Warn: Now you can not remove an element from the array because it is not processed, and if there is one element in the array, then the transaction will be duplicated
+        const currentElement = queue[0]; // pointer
+
+        if(currentElement.call_module_function == 'withdraw_unbonded') {
+            await awaiter();
+            callsPerSec++;
+            const eventStaking = await request("POST", apiURL + 'api/scan/event', {
+                data_raw: `{ "event_index": "${currentElement.block_num}-2"}`,
+                headers: {
+                    "Content-Type": "application/json",
+                    "X-API-Key": apiKey
+                }
+            }, logger);
+            currentElement.amount = +eventStaking.data.params[1].value / 1e12;
+        }
+
+        const shifted = queue.shift(); // pointer with shift
+
+        if(currentElement != shifted) {
+            throw new Error("The shifted element is not equal to the processed element");
+            logger.error("The shifted element is not equal to the processed element");
+            queue.length = 0;
+            return;
+        }
+        
+        pastQueue.push(shifted);
+    }
+    lock = false;
+}
+
 export async function makeRequest(type: 'unbond' | 'withdraw_unbonded', logger?): Promise<stake[]> {
+    await awaiter();
+    callsPerSec++;
     const response = await request("POST", apiURL + 'api/scan/extrinsics', {
         data_raw: `{ "row": 100, "page": 0, "module": "staking", "call": "${type}"}`,
         headers: {
@@ -80,7 +150,7 @@ export async function normalization(extrs: ReturnType<typeof mergeTransactions>,
 }
 
 
-function mergeTransactions(first: stake[], two: stake[], latestSaved): (stake | Transaction)[] {
+function mergeTransactions(first: stake[], two: stake[], latestSaved?): (stake | Transaction)[] {
     let i, j;
     i = j = 0;
     let n = first.length;
