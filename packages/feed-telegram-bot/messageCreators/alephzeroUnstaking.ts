@@ -31,7 +31,7 @@ export interface Message {
 
 export function createMessage(options: Message, constants) {
     return `📗 ${options.call_module_function == 'unbond' ? 'Requested unstake' : 'Withdrawn unstaked'} of *${numWithCommas(Math.floor(options.amount))} AZERO (${numWithCommas(Math.floor(options.amount * options.price))}$)*\n\n`
-        + `${generateDots((options.amount * options.price), constants, options.call_module_function == 'unbond' ? '🟣' : '🟤')}\n\n`
+        + `${generateDots((options.amount * options.price), constants, options.call_module_function == 'unbond' ? '🟣' : '🟠')}\n\n`
         + `From address: ${ScanText.createScanText(ScanText.ScanChain.AlephZeroSubscan, ScanText.ScanType.account, options.account_id)}\n\n`
         + `🅰️ [Aleph Zero](https://alephzero.org/) | ${ScanText.createScanText(ScanText.ScanChain.AlephZeroSubscan, ScanText.ScanType.tx, options.extrinsic_hash)} | ${CerbyFinance}`
 }
