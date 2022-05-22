@@ -19,17 +19,6 @@ export async function* sync(latestMessage, settings, logger) {
     let latestSended: Transaction;
     try {
         while(true) {
-            const latest: stake | undefined = (await latestMessage())?.value;
-            latestSaved = latest ? String(latest) : latestSaved;
-            if(!latest && latestSaved) {
-                logger.error("The received last saved transaction from kafka does not match the one saved in the current instance.\n" +
-                            `Received from kafka: ${String(latest)}\nLatest saved: ${String(latestSaved)}\nAn exception will be thrown after 1 minute.`);
-                await new Promise((resolve) => setTimeout(resolve, 60000));
-                throw new Error("The received last saved transaction from kafka does not match the one saved in the current instance.");
-            }
-
-
-
             let send: Transaction[];
             if(!latestSended) {
                 latestSended = pastQueue[pastQueue.length - 1];
@@ -57,6 +46,15 @@ export async function* sync(latestMessage, settings, logger) {
             //     makeRequest('bond_extra', logger) as Promise<extrastake[]>,
             //     makeRequest('rebond', logger) as Promise<extrastake[]>
             // ])
+
+            const latest: stake | undefined = (await latestMessage())?.value;
+            latestSaved = latest ? String(latest) : latestSaved;
+            if(!latest && latestSaved) {
+                logger.error("The received last saved transaction from kafka does not match the one saved in the current instance.\n" +
+                            `Received from kafka: ${String(latest)}\nLatest saved: ${String(latestSaved)}\nAn exception will be thrown after 1 minute.`);
+                await new Promise((resolve) => setTimeout(resolve, 60000));
+                throw new Error("The received last saved transaction from kafka does not match the one saved in the current instance.");
+            }
 
             if(queue.length) {
                 const received = (await normalization(
