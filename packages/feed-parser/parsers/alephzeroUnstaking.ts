@@ -16,6 +16,7 @@ export async function* sync(latestMessage, settings, logger) {
     let latestSaved, data;
     let queue: Transaction[] = [];
     let pastQueue: Transaction[] = [];
+    let latestSended: Transaction;
     try {
         while(true) {
             const latest: stake | undefined = (await latestMessage())?.value;
@@ -26,6 +27,25 @@ export async function* sync(latestMessage, settings, logger) {
                 await new Promise((resolve) => setTimeout(resolve, 60000));
                 throw new Error("The received last saved transaction from kafka does not match the one saved in the current instance.");
             }
+
+
+
+            let send: Transaction[];
+            if(!latestSended) {
+                latestSended = pastQueue[pastQueue.length - 1];
+                send = pastQueue;
+            } else {
+                send = pastQueue.filter((t) => {
+                    if(t.extrinsic_index < latestSended.extrinsic_index) {
+                        logger.warn("The duplicate was detected and eliminated.");
+                        return false;
+                    }
+                    return true;
+                })
+            }
+            yield data = send.map(t => JSON.stringify(t));
+            latestSended = send[send.length - 1];
+            pastQueue.length = 0;
 
             const unbond = await makeRequest('unbond', logger) as stake[],
                   withdraw_unbonded = await makeRequest('withdraw_unbonded', logger);
@@ -41,7 +61,7 @@ export async function* sync(latestMessage, settings, logger) {
             if(queue.length) {
                 const received = (await normalization(
                     mergeTransactions(unbond, withdraw_unbonded),
-                    queue.slice(-1)[0].extrinsic_index
+                    queue[queue.length - 1].extrinsic_index
                 ))
                 queue.push.apply(queue, received); // concat because it creates a new array, and the queue manager will have a link to the old one
             } else {
@@ -55,9 +75,6 @@ export async function* sync(latestMessage, settings, logger) {
             if(!lock) {
                 queueManager(queue, pastQueue, logger);
             }
-
-            yield data = pastQueue.map(t => JSON.stringify(t));
-            pastQueue.length = 0;
 
             if(data.length) {
                 latestSaved = JSON.stringify(data.slice(-1));
@@ -101,9 +118,10 @@ async function queueManager(queue: Transaction[], pastQueue: Transaction[], logg
         const shifted = queue.shift(); // pointer with shift
 
         if(currentElement != shifted) {
-            throw new Error("The shifted element is not equal to the processed element");
+            // throw new Error("The shifted element is not equal to the processed element");
             logger.error("The shifted element is not equal to the processed element");
             queue.length = 0;
+            lock = false;
             return;
         }
         
