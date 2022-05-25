@@ -76,7 +76,7 @@ function mergeTransactions(received: receivedType, token: string, latestSaved, l
         const latestTHash = JSON.parse(latestSaved).id;
         result.forEach((transaction) => {
             if(transaction.id == latestTHash) {
-                if(result.length > 5) {
+                if(result.length >= 3) {
                     result = result.slice(-1);
                     logger.warn("Auto-correction after a duplicate transaction was found, 5 transactions were missed. This could be due to chain reorg");
                 } else {
