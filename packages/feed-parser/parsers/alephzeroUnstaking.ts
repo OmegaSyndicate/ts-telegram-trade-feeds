@@ -3,9 +3,7 @@ import { request } from "../helpers/request";
 const apiURL = "https://alephzero.api.subscan.io/";
 const apiKey = "03f7cf1c0d0741aed2be3cfb53855f9c";
 
-let lock = false;
 let callsPerSec = 0;
-let pleaseRestart = false;
 
 setInterval(() => {
     callsPerSec = 0;
@@ -14,27 +12,16 @@ setInterval(() => {
 
 export async function* sync(latestMessage, settings, logger) {
     let latestSaved, data;
-    let queue: Transaction[] = [];
-    let pastQueue: Transaction[] = [];
-    let latestSended: Transaction;
     try {
         while(true) {
-            let send: Transaction[];
-            if(!latestSended) {
-                latestSended = pastQueue[pastQueue.length - 1];
-                send = pastQueue;
-            } else {
-                send = pastQueue.filter((t) => {
-                    if(t.extrinsic_index < latestSended.extrinsic_index) {
-                        logger.warn("The duplicate was detected and eliminated.");
-                        return false;
-                    }
-                    return true;
-                })
+            const latest: stake | undefined = (await latestMessage())?.value;
+            latestSaved = latest ? String(latest) : latestSaved;
+            if(!latest && latestSaved) {
+                logger.error("The received last saved transaction from kafka does not match the one saved in the current instance.\n" +
+                            `Received from kafka: ${String(latest)}\nLatest saved: ${String(latestSaved)}\nAn exception will be thrown after 1 minute.`);
+                await new Promise((resolve) => setTimeout(resolve, 60000));
+                throw new Error("The received last saved transaction from kafka does not match the one saved in the current instance.");
             }
-            yield data = send.map(t => JSON.stringify(t));
-            latestSended = send[send.length - 1];
-            pastQueue.length = 0;
 
             const unbond = await makeRequest('unbond', logger) as stake[],
                   withdraw_unbonded = await makeRequest('withdraw_unbonded', logger);
@@ -47,32 +34,10 @@ export async function* sync(latestMessage, settings, logger) {
             //     makeRequest('rebond', logger) as Promise<extrastake[]>
             // ])
 
-            const latest: stake | undefined = (await latestMessage())?.value;
-            latestSaved = latest ? String(latest) : latestSaved;
-            if(!latest && latestSaved) {
-                logger.error("The received last saved transaction from kafka does not match the one saved in the current instance.\n" +
-                            `Received from kafka: ${String(latest)}\nLatest saved: ${String(latestSaved)}\nAn exception will be thrown after 1 minute.`);
-                await new Promise((resolve) => setTimeout(resolve, 60000));
-                throw new Error("The received last saved transaction from kafka does not match the one saved in the current instance.");
-            }
-
-            if(queue.length) {
-                const received = (await normalization(
-                    mergeTransactions(unbond, withdraw_unbonded),
-                    queue[queue.length - 1].extrinsic_index
-                ))
-                queue.push.apply(queue, received); // concat because it creates a new array, and the queue manager will have a link to the old one
-            } else {
-                const received = (await normalization(
-                    mergeTransactions(unbond, withdraw_unbonded, latestSaved),
-                    latest ? JSON.parse(String(latest)).extrinsic_index : '0'
-                ))
-                queue.push.apply(queue, received);
-            }
-
-            if(!lock) {
-                queueManager(queue, pastQueue, logger);
-            }
+            yield data = (await normalization(
+                mergeTransactions(unbond, withdraw_unbonded, latestSaved),
+                latest ? JSON.parse(String(latest)).extrinsic_index : '0'
+            )).map(t => JSON.stringify(t));
 
             if(data.length) {
                 latestSaved = JSON.stringify(data.slice(-1));
@@ -91,43 +56,6 @@ async function awaiter(): Promise<void> {
     }
 }
 
-async function queueManager(queue: Transaction[], pastQueue: Transaction[], logger): Promise<void> {
-    if(lock) {
-        throw new Error("The queue manager can only be started in one instance!");
-    }
-    lock = true;
-    while(queue.length) {
-        // Warn: Now you can not remove an element from the array because it is not processed, and if there is one element in the array, then the transaction will be duplicated
-        const currentElement = queue[0]; // pointer
-
-        if(currentElement.call_module_function == 'withdraw_unbonded') {
-            await awaiter();
-            callsPerSec++;
-            const eventStaking = await request("POST", apiURL + 'api/scan/event', {
-                data_raw: `{ "event_index": "${currentElement.block_num}-2"}`,
-                headers: {
-                    "Content-Type": "application/json",
-                    "X-API-Key": apiKey
-                }
-            }, logger);
-            currentElement.amount = +eventStaking.data.params[1].value / 1e12;
-        }
-
-        const shifted = queue.shift(); // pointer with shift
-
-        if(currentElement != shifted) {
-            // throw new Error("The shifted element is not equal to the processed element");
-            logger.error("The shifted element is not equal to the processed element");
-            queue.length = 0;
-            lock = false;
-            return;
-        }
-        
-        pastQueue.push(shifted);
-    }
-    lock = false;
-}
-
 export async function makeRequest(type: 'unbond' | 'withdraw_unbonded', logger?): Promise<stake[]> {
     await awaiter();
     callsPerSec++;
@@ -144,22 +72,32 @@ export async function makeRequest(type: 'unbond' | 'withdraw_unbonded', logger?)
     return response.data.extrinsics.reverse();
 }
 
-export async function normalization(extrs: ReturnType<typeof mergeTransactions>, extrinsic_index?: string): Promise<Transaction[]> {
+export async function normalization(extrs: ReturnType<typeof mergeTransactions>, extrinsic_index?: string, logger?): Promise<Transaction[]> {
     const extrinsics = extrs.filter((extrinsic) => extrinsic.extrinsic_index > extrinsic_index);
     if(extrinsics.length) {
         const price = (await request('GET', "https://api.coingecko.com/api/v3/simple/price", { params: {
             ids: "aleph-zero",
             vs_currencies: "usd"
         }}))['aleph-zero'].usd;
-        return extrinsics.map((extrinsic: Transaction) => {
-            extrinsic.feedType = "stakeEnded";
-            extrinsic.price = price;
-            extrinsic.amount = 
-                /* extrinsic.call_module_function == 'bond'
-                   ? +JSON.parse(extrinsic.params)[1].value / 1e12
-                :*/ +JSON.parse(extrinsic.params)[0].value / 1e12
-            return extrinsic;
-        });
+        for(let i = 0; i < extrinsics.length; i++) {
+            extrinsics[i].feedType = "stakeEnded";
+            extrinsics[i].price = price;
+            if(extrinsics[i].call_module_function == 'withdraw_unbonded') {
+                await awaiter();
+                callsPerSec++;
+                const eventStaking = await request("POST", apiURL + 'api/scan/event', {
+                    data_raw: `{ "event_index": "${extrinsics[i].block_num}-2"}`,
+                    headers: {
+                        "Content-Type": "application/json",
+                        "X-API-Key": apiKey
+                    }
+                }, logger);
+                extrinsics[i].amount = +eventStaking.data.params[1].value / 1e12;
+            } else {
+                extrinsics[i].amount = +JSON.parse(extrinsics[i].params)[0].value / 1e12 
+            }
+        }
+        return extrinsics;
     } else {
         return [];
     }
