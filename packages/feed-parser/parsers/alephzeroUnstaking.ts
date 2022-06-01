@@ -1,3 +1,4 @@
+import { Logger } from "../helpers/logger";
 import { request } from "../helpers/request";
 
 const apiURL = "https://alephzero.api.subscan.io/";
@@ -72,7 +73,7 @@ export async function makeRequest(type: 'unbond' | 'withdraw_unbonded', logger?)
     return response.data.extrinsics.reverse();
 }
 
-export async function normalization(extrs: ReturnType<typeof mergeTransactions>, extrinsic_index?: string, logger?): Promise<Transaction[]> {
+export async function normalization(extrs: ReturnType<typeof mergeTransactions>, extrinsic_index?: string, logger?: Logger): Promise<Transaction[]> {
     const extrinsics = extrs.filter((extrinsic) => extrinsic.extrinsic_index > extrinsic_index);
     if(extrinsics.length) {
         const price = (await request('GET', "https://api.coingecko.com/api/v3/simple/price", { params: {
@@ -95,6 +96,10 @@ export async function normalization(extrs: ReturnType<typeof mergeTransactions>,
                 extrinsics[i].amount = +eventStaking.data.params[1].value / 1e12;
             } else {
                 extrinsics[i].amount = +JSON.parse(extrinsics[i].params)[0].value / 1e12 
+            }
+            if(extrinsics[i].amount > 1e9) {
+                logger.warn('A too large number was received, the transaction was skipped. TX: ' + extrinsics[i].extrinsic_hash);
+                extrinsics[i].amount = 0;
             }
         }
         return extrinsics;
