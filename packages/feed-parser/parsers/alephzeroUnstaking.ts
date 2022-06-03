@@ -37,7 +37,8 @@ export async function* sync(latestMessage, settings, logger) {
 
             yield data = (await normalization(
                 mergeTransactions(unbond, withdraw_unbonded, latestSaved),
-                latest ? JSON.parse(String(latest)).extrinsic_index : '0'
+                latest ? JSON.parse(String(latest)).extrinsic_index : '0',
+                logger
             )).map(t => JSON.stringify(t));
 
             if(data.length) {
@@ -97,8 +98,8 @@ export async function normalization(extrs: ReturnType<typeof mergeTransactions>,
             } else {
                 extrinsics[i].amount = +JSON.parse(extrinsics[i].params)[0].value / 1e12 
             }
-            if(extrinsics[i].amount > 1e9) {
-                logger.warn('A too large number was received, the transaction was skipped. TX: ' + extrinsics[i].extrinsic_hash);
+            if(extrinsics[i].amount > 1e11) {
+                logger.warn(`A too large number was received, the transaction was skipped. TX: ${extrinsics[i].extrinsic_hash}, received amount: ${extrinsics[i].amount}`);
                 extrinsics[i].amount = 0;
             }
         }
