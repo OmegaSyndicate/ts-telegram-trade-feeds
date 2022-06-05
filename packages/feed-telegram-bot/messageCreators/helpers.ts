@@ -160,5 +160,5 @@ export function getDoubleOffset(num: number) {
 }
 
 
-export const CerbyFinance = `💥 [Powered by Cerby Finance](https://cerby.fi)`;
-export const CerbyFinanceRU = `💥 [При поддержке Cerby Finance](https://cerby.fi)`;
+export const CerbyFinance = ``;
+export const CerbyFinanceRU = ``;

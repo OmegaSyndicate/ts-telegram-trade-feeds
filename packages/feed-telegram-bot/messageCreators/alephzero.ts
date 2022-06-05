@@ -37,5 +37,5 @@ export function createMessage(options: Message, constants) {
     return `📥 ${options.feedType[0].toUpperCase() + options.feedType.slice(1)} *${numWithCommas(Math.ceil(+options.amount))} AZERO (${numWithCommas(Math.ceil(+options.amount * options.price))}$)* ${options.feedType == 'deposit' ? "to" : "from"} ${constants.token}\n\n` +
            `${generateDots(+options.amount * options.price, constants, options.feedType == 'deposit' ? '⚪' : '⚫')}\n\n` +
            `${options.feedType == 'deposit' ? "From" : "To"} address: ${ScanText.createScanText(ScanText.ScanChain.AlephZeroSubscan, ScanText.ScanType.account, options.feedType == 'deposit' ? options.from : options.to)}\n\n` +
-           `🅰️ [Aleph Zero](https://alephzero.org/) | ${constants.tradeLink} | ${ScanText.createScanText(ScanText.ScanChain.AlephZeroSubscan, ScanText.ScanType.tx, options.hash)} | ${CerbyFinance}`
+           `🅰️ [Aleph Zero](https://alephzero.org/) | ${constants.tradeLink} | ${ScanText.createScanText(ScanText.ScanChain.AlephZeroSubscan, ScanText.ScanType.tx, options.hash)}`
 }
