@@ -21,7 +21,7 @@ export async function* sync(latestMessage, settings, logger) {
                 throw new Error("The received last saved transaction from kafka does not match the one saved in the current instance.");
             }
             console.log("Latest", String(latest));
-            yield data = (await makeRequest(token, logger, latestSaved, latest)).map(t => JSON.stringify(t));
+            yield data = (await makeRequest(token, logger, latestSaved, settings.fromTimestamp || 0, latest)).map(t => JSON.stringify(t));
             if(data.length) {
                 latestSaved = JSON.stringify(data.slice(-1));
             }
@@ -45,7 +45,7 @@ async function getToken(symbol, logger) {
     return token.data.tokens[0].id;
 }
 
-async function makeRequest(token, logger, latestSaved, latest?) {
+async function makeRequest(token, logger, latestSaved, fromTimestamp, latest?) {
     let received: receivedType = {
         buy: [],
         sold: []
@@ -54,7 +54,7 @@ async function makeRequest(token, logger, latestSaved, latest?) {
         for(let type = 0; type <= 1; type++) { // type 0 == 'buy', type 1 == 'sold'
             let typeTransaction: "buy" | "sold" = type ? "sold" : "buy";
             for(let amount = 1000, offset = 0; amount >= 1000; offset += amount) {
-                let tempReceived = await request("POST", apiUrl, { query: createSwapsQuery(typeTransaction, token, 0, 1000, offset) }, logger);
+                let tempReceived = await request("POST", apiUrl, { query: createSwapsQuery(typeTransaction, token, fromTimestamp, 1000, offset) }, logger);
                 if(tempReceived['errors']) {
                     logger.error(tempReceived.errors);
                     return;
@@ -83,7 +83,12 @@ async function makeRequest(token, logger, latestSaved, latest?) {
             let typeTransaction: "buy" | "sold" = type ? "sold" : "buy";
             let amount = amounts[typeTransaction] || 10,
                 offset = offsets[typeTransaction] || 0;
-            let tempReceived = await request("POST", apiUrl, { query: createSwapsQuery(typeTransaction, token, lastObject.timestamp, amount, offset) });
+            
+            if (lastObject.timestamp > fromTimestamp) {
+                fromTimestamp = lastObject.timestamp
+            }
+            
+            let tempReceived = await request("POST", apiUrl, { query: createSwapsQuery(typeTransaction, token, fromTimestamp, amount, offset) });
             if(tempReceived['errors'] || (!tempReceived.data.swaps.length && type > 1)) {
                 logger.error(tempReceived.errors || "The transaction was not found.");
                 return;

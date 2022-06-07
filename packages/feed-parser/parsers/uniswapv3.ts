@@ -17,7 +17,7 @@ export async function* sync(latestMessage, settings, logger) {
                 await new Promise((resolve) => setTimeout(resolve, 60000));
                 throw new Error("The received last saved transaction from kafka does not match the one saved in the current instance.");
             }
-            yield data = (await makeRequest(settings.token, settings.tokenHash, latest, logger)).map(t => JSON.stringify(t));
+            yield data = (await makeRequest(settings.token, settings.tokenHash, latest, logger, settings.fromTimestamp)).map(t => JSON.stringify(t));
             if(data.length) {
                 latestSaved = JSON.stringify(data.slice(-1));
             }
@@ -29,11 +29,11 @@ export async function* sync(latestMessage, settings, logger) {
     }
 }
 
-async function makeRequest(token: string, tokenHash: string, latest, logger) {
-    let timestamp_gt = 0;
+async function makeRequest(token: string, tokenHash: string, latest, logger, fromTimestamp) {
+    let timestamp_gt = fromTimestamp || 0;
     const lastObject = latest ? JSON.parse(String(latest)) : '';
 
-    if(latest) {
+    if (latest && lastObject.timestamp > timestamp_gt) {
         timestamp_gt = lastObject.timestamp;
     }
 
