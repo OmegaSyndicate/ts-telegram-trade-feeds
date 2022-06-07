@@ -160,5 +160,5 @@ export function getDoubleOffset(num: number) {
 }
 
 
-export const CerbyFinance = ``;
+export const CerbyFinance = `💥 Powered by [DefiPlaza](https://defiplaza.net)`;
 export const CerbyFinanceRU = ``;
