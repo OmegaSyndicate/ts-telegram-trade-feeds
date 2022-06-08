@@ -1,277 +1,115 @@
 {
-    "botToken": "2018560301:AAFYYdALuxX_ldHT91iJ3oYUxzjBDvjX6r4",
     "mainWorkerName": "mainWorker",
     "workerPoll": 100,
     "kafkaSettings": {
-        "brokers": [ "localhost:9092" ]
+        "brokers": [ "kafka:9092" ]
     },
     "logsChat": {
-        "channel": -1001571344024
+        "channel": -605794472
     },
     "tokens": [
-        {
-            "token": "Radix",
-            "type": "uniswap-ascending",
-            "apiUrl": "https://api-exrd.wisetoken.me",
-            "synchronizeIntervalMs": 30000,
-            "publishers": [
-                {
-                    "channel": "@exrdmin1000",
-                    "USDInterval": 1000,
-                    "minUSD": 1000,
-                    "withSync" : true,
-                    "uniswapPair": "0x6468e79a80c0eab0f9a2b574c8d5bc374af59414",
-                    "messageCreator": "Radix-uniswap"
-                }
-            ]
-        },
-        {
-            "token": "Wise",
-            "type": "uniswap-ascending",
-            "stakingType": "uniswap",
-            "apiUrl": "https://api.wisetoken.me",
-            "synchronizeIntervalMs": 30000,
-            "publishers": [
-                {
-                    "channel": "@wisefeed",
-                    "USDInterval": 1000,
-                    "minUSD": 1000,
-                    "withSync" : true,
-                    "uniswapPair": "0x21b8065d10f73ee2e260e5b47d3344d3ced7596e",
-                    "messageCreator": "Wise-uniswap"
-                }
-            ]
-        },
-        {
-            "token": "Wise",
-            "type": "uniswap-ascending",
-            "stakingType": "wise",
-            "apiUrl": "https://api.wisetoken.me",
-            "synchronizeIntervalMs": 30000,
-            "publishers": [
-                {
-                    "channel": "@wisefeed",
-                    "USDInterval": 1000,
-                    "minUSD": 1000,
-                    "withSync" : true,
-                    "uniswapPair": "0x21b8065d10f73ee2e260e5b47d3344d3ced7596e",
-                    "messageCreator": "Wise-stakes-uniswap"
-                }
-            ]
-        },
-        {
-            "token": "tXRDUSD",
-            "type": "bitfinex",
-            "synchronizeIntervalMs": 20000,
-            "publishers": [
-                {
-                    "channel": "@DefiPlazaETH",
-                    "USDInterval": 100,
-                    "minUSD": 0,
-                    "withSync" : true
-                }
-            ]
-        },
-        {
-            "token": "EXRD-USDT",
-            "type": "kucoin",
-            "synchronizeIntervalMs": 20000,
-            "publishers": [
-                {
-                    "channel": "@DefiPlazaETH",
-                    "USDInterval": 1000,
-                    "minUSD": 0,
-                    "withSync" : true
-                }
-            ]
-        },
-        {
-            "token": "eXRD",
-            "type": "defiplaza",
-            "synchronizeIntervalMs": 20000,
-            "publishers": [
-                {
-                    "channel": "@DefiPlazaETH",
-                    "USDInterval": 1000,
-                    "minUSD": 0,
-                    "withSync": true
-                }
-            ]
-        },
-        {
-            "token": "USDC",
-            "pair": "Matic",
-            "type": "CERBY-swaps",
-            "stakingType": "QuickSwap",
-            "apiURL": "http://nodes2.valar-solutions.com:8000/subgraphs/name/deft/deft-quickswap-v2",
-            "synchronizeIntervalMs": 30000,
-            "publishers": [
-                {
-                    "channel": "@DefiPlazaFeed",
-                    "USDInterval": 1000,
-                    "withSync" : true,
-                    "scanURL": "https://polygonscan.com/",
-                    "chain": "💨 [Quickswap](https://info.quickswap.exchange/pair/0xf92b726b10956ff95ebabdd6fd92d180d1e920da)",
-                    "DexToolsLink": "https://www.dextools.io/app/polygon/pair-explorer/0xf92b726b10956ff95ebabdd6fd92d180d1e920da",
-                    "minUSD": 100,
-                    "fromTimestamp": 1634256000
-                }
-            ]
-        },
-        {
-            "token": "BUSD",
-            "pair": "Bnb",
-            "type": "CERBY-swaps",
-            "stakingType": "PancakeSwap",
-            "apiURL": "http://nodes2.valar-solutions.com:8000/subgraphs/name/deft/deft-pancakeswap-v2",
-            "synchronizeIntervalMs": 30000,
-            "publishers": [
-                {
-                    "channel": "@DefiPlazaFeed",
-                    "USDInterval": 1000,
-                    "withSync" : true,
-                    "scanURL": "https://bscscan.com/",
-                    "chain": "🥞 [Pancakeswap](https://pancakeswap.finance/info/pool/0x493e990ccc67f59a3000effa9d5b1417d54b6f99)",
-                    "DexToolsLink": "https://www.dextools.io/app/bsc/pair-explorer/0x493e990ccc67f59a3000effa9d5b1417d54b6f99",
-                    "minUSD": 100,
-                    "fromTimestamp": 1634256000
-                }
-            ]
-        },
-        {
-            "token": "USDC",
-            "pair": "Eth",
-            "type": "CERBY-swaps",
-            "stakingType": "Uniswap",
-            "apiURL": "http://nodes2.valar-solutions.com:8000/subgraphs/name/deft/deft-uniswap-v3",
-            "synchronizeIntervalMs": 30000,
-            "publishers": [
-                {
-                    "channel": "@DefiPlazaFeed",
-                    "USDInterval": 1000,
-                    "withSync" : true,
-                    "scanURL": "https://etherscan.io/",
-                    "chain": "🦄 [Uniswap](https://info.uniswap.org/pairs#/pools/0x81489b0e7c7a515799c89374e23ac9295088551d)",
-                    "DexToolsLink": "https://www.dextools.io/app/ether/pair-explorer/0x81489b0e7c7a515799c89374e23ac9295088551d",
-                    "minUSD": 100,
-                    "fromTimestamp": 1634256000
-                }
-            ]
-        },
-        {
-            "token": "CERBY",
-            "type": "CERBY-bridge",
-            "synchronizeIntervalMs": 30000,
-            "getPriceGraph": "http://nodes2.valar-solutions.com:8000/subgraphs/name/deft/deft-pancakeswap-v2",
-            "bridges": [
-                {
-                    "symbol": "BSC",
-                    "apiURL": "https://bridge.cerby.fi/subgraphs/name/deft/deft-bridge-binance"
-                },
-                {
-                    "symbol": "ETH",
-                    "apiURL": "https://bridge.cerby.fi/subgraphs/name/deft/deft-bridge-ethereum"
-                },
-                {
-                    "symbol": "Polygon",
-                    "apiURL": "https://bridge.cerby.fi/subgraphs/name/deft/deft-bridge-polygon"
-                }
-            ],
-            "publishers": [
-                {
-                    "channel": "@DefiPlazaFeed",
-                    "USDInterval": 1000,
-                    "fromTimestamp": 1634256000,
-                    "minUSD": 100,
-                    "withSync" : true
-                }
-            ]
-        },
-        {
-            "token": "Polygon",
-            "pair": "Matic",
-            "stakingTypes": ["started", "canceled", "completed"],
-            "type": "CERBY-staking",
-            "apiURL": "https://graph.cerby.fi/subgraphs/name/deft/staking-polygon",
-            "jsonRpc": "https://secret:X4gDeGtfQy2M@polygon-node.valar-solutions.com",
-            "ETHpriceGraph": "https://graph.cerby.fi/subgraphs/name/deft/deft-quickswap-v2",
-            "DEFTpriceGraph": "https://graph.cerby.fi/subgraphs/name/deft/deft-quickswap-v2",
-            "synchronizeIntervalMs": 30000,
-            "publishers": [
-                {
-                    "channel": "@DefiPlazaFeed",
-                    "USDInterval": 1000,
-                    "withSync" : true,
-                    "scanURL": "https://polygonscan.com/",
-                    "minUSD": 100,
-                    "fromTimestamp": 1634256000
-                }
-            ]
-        },
-        {
-            "token": "Binance",
-            "pair": "Bnb",
-            "stakingTypes": ["started", "canceled", "completed"],
-            "type": "CERBY-staking",
-            "apiURL": "http://nodes2.valar-solutions.com:8000/subgraphs/name/deft/staking-binance",
-            "jsonRpc": "https://secret:X4gDeGtfQy2M@bsc-node.valar-solutions.com",
-            "ETHpriceGraph": "http://nodes2.valar-solutions.com:8000/subgraphs/name/deft/deft-pancakeswap-v2",
-            "DEFTpriceGraph": "http://nodes2.valar-solutions.com:8000/subgraphs/name/deft/deft-pancakeswap-v2",
-            "synchronizeIntervalMs": 30000,
-            "publishers": [
-                {
-                    "channel": "@DefiPlazaFeed",
-                    "USDInterval": 1000,
-                    "withSync" : true,
-                    "scanURL": "https://bscscan.com/",
-                    "minUSD": 100,
-                    "fromTimestamp": 1634256000
-                }
-            ]
-        },
-        {
-            "token": "Avalanche",
-            "pair": "Avax",
-            "stakingTypes": ["started", "canceled", "completed"],
-            "type": "CERBY-staking",
-            "cerby": "cerby",
-            "apiURL": "http://nodes2.valar-solutions.com:8000/subgraphs/name/cerby/staking-avalanche",
-            "jsonRpc": "none",
-            "ETHpriceGraph": "http://nodes2.valar-solutions.com:8000/subgraphs/name/cerby/cerby-traderjoe-v2",
-            "DEFTpriceGraph": "http://nodes2.valar-solutions.com:8000/subgraphs/name/cerby/cerby-traderjoe-v2",
-            "synchronizeIntervalMs": 30000,
-            "publishers": [
-                {
-                    "channel": "@DefiPlazaFeed",
-                    "USDInterval": 1000,
-                    "withSync" : true,
-                    "scanURL": "https://snowtrace.io/",
-                    "minUSD": 100,
-                    "fromTimestamp": 0
-                }
-            ]
-        },
-        {
-            "token": "Fantom",
-            "pair": "Ftm",
-            "stakingTypes": ["started", "canceled", "completed"],
-            "type": "CERBY-staking",
-            "cerby": "cerby",
-            "apiURL": "http://nodes2.valar-solutions.com:8000/subgraphs/name/cerby/staking-fantom",
-            "jsonRpc": "none",
-            "ETHpriceGraph": "http://nodes2.valar-solutions.com:8000/subgraphs/name/cerby/cerby-spookyswap-v2",
-            "DEFTpriceGraph": "http://nodes2.valar-solutions.com:8000/subgraphs/name/cerby/cerby-spookyswap-v2",
-            "synchronizeIntervalMs": 30000,
-            "publishers": [
-                {
-                    "channel": "@DefiPlazaFeed",
-                    "USDInterval": 1000,
-                    "withSync" : true,
-                    "scanURL": "https://snowtrace.io/",
-                    "minUSD": 100,
-                    "fromTimestamp": 0
-                }
-            ]
-        }
+       {
+          "token": "eXRD",
+          "pairs": ["0x684b00a5773679f88598a19976fbeb25a68e9a5f"],
+          "type": "uniswapv2",
+          "synchronizeIntervalMs": 30000,
+          "fromTimestamp": 1654603762,
+          "publishers": [
+             {
+                "channel": "@xrdtrades",
+                "USDInterval": 1000,
+                "minUSD": 2500,
+                "withSync": false
+             }
+          ]
+       },
+       {
+          "token": "eXRD",
+          "tokenHash": "0x6468e79a80c0eab0f9a2b574c8d5bc374af59414",
+          "type": "uniswapv3",
+          "synchronizeIntervalMs": 30000,
+          "fromTimestamp": 1654603762,
+          "publishers": [
+             {
+                "channel": "@xrdtrades",
+                "USDInterval": 1000,
+                "minUSD": 2500,
+                "withSync": false
+             }
+          ]
+       },
+       {
+          "token": "tXRDUSD",
+          "type": "bitfinex",
+          "synchronizeIntervalMs": 20000,
+          "publishers": [
+             {
+                "channel": "@xrdtrades",
+                "USDInterval": 1000,
+                "minUSD": 2500,
+                "withSync": false,
+                "fromTimestamp": 1654466400
+             }
+          ]
+       },
+       {
+          "token": "EXRD-USDT",
+          "type": "kucoin",
+          "synchronizeIntervalMs": 20000,
+          "publishers": [
+             {
+                "channel": "@xrdtrades",
+                "USDInterval": 1000,
+                "minUSD": 2500,
+                "withSync": false,
+                "fromTimestamp": 1654466400
+             }
+          ]
+       },
+       {
+          "token": "eXRD",
+          "type": "defiplaza",
+          "synchronizeIntervalMs": 20000,
+          "fromTimestamp": 1654603762,
+          "publishers": [
+             {
+                "channel": "@xrdtrades",
+                "USDInterval": 1000,
+                "minUSD": 1000,
+                "withSync": false,
+                "fromTimestamp": 1654466400
+             }
+          ]
+       },
+       {
+          "token": "DFP2",
+          "type": "defiplaza",
+          "synchronizeIntervalMs": 20000,
+          "fromTimestamp": 1654603762,
+          "publishers": [
+             {
+                "channel": "@dfp2trades",
+                "USDInterval": 1000,
+                "minUSD": 1000,
+                "withSync": false,
+                "fromTimestamp": 1654466400
+             }
+          ]
+       },
+       {
+          "token": "DFP2",
+          "pairs": ["0x820d74078eb4c94e24ef0bcc8ccf848a238f473e"],
+          "type": "uniswapv2",
+          "synchronizeIntervalMs": 30000,
+          "fromTimestamp": 1654603762,
+          "publishers": [
+             {
+                "channel": "@dfp2trades",
+                "USDInterval": 1000,
+                "minUSD": 1000,
+                "withSync": false
+             }
+          ]
+       }
     ]
 }

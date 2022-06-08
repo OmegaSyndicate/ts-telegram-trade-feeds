@@ -41,8 +41,8 @@ function publisherKey({ token, type, channel, stakingType }) {
 config.tokens.forEach(token => {
     if(token.publishers && token.publishers instanceof Array) {
         token.publishers.forEach(async (publisher: any) => {
-            publisher.botToken = config.botToken;
-            publisher.discordToken = config.discordToken;
+            publisher.botToken = process.env.TELEGRAM_TOKEN; //config.botToken;
+            publisher.discordToken = process.env.DISCORD_TOKEN;  //config.discordToken;
             publisher.kafkaSettings = config.kafkaSettings;
             publisher.token = token.token;
             publisher.type = token.type;
