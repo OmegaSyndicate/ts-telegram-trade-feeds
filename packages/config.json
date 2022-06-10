@@ -2,7 +2,7 @@
     "mainWorkerName": "mainWorker",
     "workerPoll": 100,
     "kafkaSettings": {
-        "brokers": [ "kafka:9092" ]
+        "brokers": [ "10.0.1.32:9092" ]
     },
     "logsChat": {
         "channel": -605794472
@@ -41,7 +41,7 @@
        {
           "token": "tXRDUSD",
           "type": "bitfinex",
-          "synchronizeIntervalMs": 20000,
+          "synchronizeIntervalMs": 30000,
           "publishers": [
              {
                 "channel": "@xrdtrades",
@@ -55,7 +55,7 @@
        {
           "token": "EXRD-USDT",
           "type": "kucoin",
-          "synchronizeIntervalMs": 20000,
+          "synchronizeIntervalMs": 30000,
           "publishers": [
              {
                 "channel": "@xrdtrades",
@@ -67,24 +67,50 @@
           ]
        },
        {
+          "token": "xrd_usdt",
+          "type": "gate",
+          "synchronizeIntervalMs": 30000,
+          "publishers": [
+             {
+                "channel": "@xrdtrades",
+                "USDInterval": 1000,
+                "minUSD": 2500,
+                "withSync": false
+             }
+          ]
+       },
+       {
+          "token": "xrd_usdt",
+          "type": "mexc",
+          "synchronizeIntervalMs": 30000,
+          "fromTimestamp": 1654812000,
+          "publishers": [
+             {
+                "channel": "@xrdtrades",
+                "USDInterval": 1000,
+                "minUSD": 2500,
+                "withSync": false
+             }
+          ]
+       },
+       {
           "token": "eXRD",
           "type": "defiplaza",
-          "synchronizeIntervalMs": 20000,
+          "synchronizeIntervalMs": 30000,
           "fromTimestamp": 1654603762,
           "publishers": [
              {
                 "channel": "@xrdtrades",
                 "USDInterval": 1000,
                 "minUSD": 1000,
-                "withSync": false,
-                "fromTimestamp": 1654466400
+                "withSync": false
              }
           ]
        },
        {
           "token": "DFP2",
           "type": "defiplaza",
-          "synchronizeIntervalMs": 20000,
+          "synchronizeIntervalMs": 30000,
           "fromTimestamp": 1654603762,
           "publishers": [
              {
