@@ -13,5 +13,5 @@ export function createMessage(options: Message, constants) {
     return `${options.side == "buy" ? "🚀" : "👹"} *1 ${tokens[0]} = ${options.price.toFixed(4)} ${tokens[1]}*\n`
     +   `${options.side == "buy" ? "Bought" : "Sold"} *${numWithCommas(Math.ceil(options.size))} ${tokens[0]}* for *${numWithCommas(Math.ceil(options.size * options.price))} ${tokens[1]}* on Kucoin\n\n`
     +   `${generateDots(options.size * options.price, constants, options.side == "buy" ? "🟢" : "🔴")}\n\n`
-    +   `🪙 [Kucoin](https://trade.kucoin.com/EXRD-USDT) | ${CerbyFinance}`
+    +   `🪙 [Kucoin](https://trade.kucoin.com/EXRD-USDT) ${CerbyFinance}`
 }

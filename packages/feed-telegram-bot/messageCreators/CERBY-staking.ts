@@ -95,5 +95,5 @@ export async function createMessage(options: Message, constants, logger) {
             `${generateDots(+options.stakedAmount * +options.deftInUsd, constants, boundEmoji)}\n\n` +
             additionalInfo +
             `From address: ${scanByChain.createLink(ScanText.ScanType.account, options.owner.id)}\n\n` +
-            `🥩 [Staking](https://app.cerby.fi/staking) | ${scanByChain.createLink(ScanText.ScanType.tx, options.feedType == "stakeStarted" ? options.startTx : options.endTx)} | ${CerbyFinance}`
+            `🥩 [Staking](https://app.cerby.fi/staking) | ${scanByChain.createLink(ScanText.ScanType.tx, options.feedType == "stakeStarted" ? options.startTx : options.endTx)} ${CerbyFinance}`
 }

@@ -1,0 +1,32 @@
+{
+   "name": "whale-bot",
+   "version": "1.0.0",
+   "description": "",
+   "main": "index.js",
+   "type": "module",
+   "scripts": {
+      "test": "echo \"Error: no test specified\" && exit 1"
+   },
+   "author": "",
+   "license": "ISC",
+   "dependencies": {
+      "cors": "^2.8.5",
+      "express": "^4.18.1",
+      "migrate": "^1.8.0",
+      "node-fetch": "^3.2.6",
+      "node-telegram-bot-api": "^0.58.0",
+      "parse-dashboard": "^4.1.4",
+      "parse-server": "^5.2.4",
+      "redis": "^4.2.0",
+      "sqs-consumer": "^5.7.0",
+      "sqs-producer": "^2.1.0"
+   },
+   "devDependencies": {
+      "@types/node": "^18.0.3",
+      "@types/node-telegram-bot-api": "^0.57.1",
+      "@types/parse": "^2.18.16",
+      "@types/redis": "^4.0.11",
+      "ts-node": "^10.8.2",
+      "typescript": "^4.7.4"
+   }
+}

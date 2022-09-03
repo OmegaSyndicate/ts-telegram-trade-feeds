@@ -29,8 +29,8 @@ export interface Message {
 }
 
 export function createMessage(options: Message, constants) {
-    return `${options.type == "Bought" ? "🚀" : "👹"} *1 ${constants.token.substring(1,4)} = ${options.price.toFixed(4)} ${constants.token.substring(4)}T*\n`
-    +   `${options.type} *${numWithCommas(Math.ceil(options.amount))} ${constants.token.substring(1,4)}* for *${numWithCommas(Math.ceil(options.amount * options.price))} ${constants.token.substring(4)}T* on Bitfinex\n\n`
+    return `${options.type == "Bought" ? "🚀" : "👹"} *1 ${constants.token.substring(1,4)} = ${options.price.toFixed(4)} ${constants.token.substring(4)}*\n`
+    +   `${options.type} *${numWithCommas(Math.ceil(options.amount))} ${constants.token.substring(1,4)}* for *${numWithCommas(Math.ceil(options.amount * options.price))} ${constants.token.substring(4)}* on Bitfinex\n\n`
     +   `${generateDots(options.amount * options.price, constants, options.type == "Bought" ? "🟢" : "🔴")}\n\n`
-    +   `💵 [Bitfinex](https://trading.bitfinex.com/t/XRDUSD?type=exchange) | ${CerbyFinance}`
+    +   `💵 [Bitfinex](https://trading.bitfinex.com/t/XRDUSD?type=exchange) ${CerbyFinance}`
 }

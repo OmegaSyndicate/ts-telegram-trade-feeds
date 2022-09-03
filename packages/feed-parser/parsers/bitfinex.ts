@@ -3,7 +3,7 @@ import { request } from "../helpers/request";
 export async function* sync(latestMessage, settings, logger) {
     let params: IParams = {
         limit: 10000,
-        start: 0,
+        start: settings.fromTimestamp,
         end: Date.now(),
         sort: 1
     };

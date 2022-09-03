@@ -23,6 +23,7 @@ async function synchronization() {
                 try {
                     data = (await parser.next()).value;
                     console.log("Data", data);
+                    // logger.log(workerData.type + ": " + JSON.stringify(data));
                     if(data == undefined || !data) {
                         throw new Error("Generator function returned undefined. Will reboot in 20 seconds.");
                     } else if(!(data instanceof Array)) {

@@ -81,7 +81,7 @@ config.tokens.forEach(token => {
 // Logger
 async function createLogger() {
     const logsPublisher = {
-        botToken: config.botToken,
+        botToken: process.env.TELEGRAM_TOKEN,
         channel: config.logsChat.channel,
         kafkaSettings: config.kafkaSettings,
         withSync: true,

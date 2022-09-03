@@ -14,5 +14,5 @@ export function createMessage(options: Message, constants) {
     return `${options.side == "buy" ? "🚀" : "👹"} *1 ${constants.token} = ${(+options.px).toFixed(constants.priceDigit)} ${symbol}*\n`
     +   `${options.side == "buy" ? "Bought" : "Sold"} *${numWithCommas(Math.ceil(+options.sz))} ${constants.token}* for *${numWithCommas(Math.ceil(+options.sz * +options.px))} ${symbol}* on Okex\n\n`
     +   `${generateDots(+options.sz * +options.px, constants, options.side == "buy" ? "🟢" : "🔴")}\n\n`
-    +   `${constants.mainLink} | 👌 [Okex](${constants.tradeLinks[symbol]}) | ${CerbyFinance}`
+    +   `${constants.mainLink} | 👌 [Okex](${constants.tradeLinks[symbol]}) ${CerbyFinance}`
 }

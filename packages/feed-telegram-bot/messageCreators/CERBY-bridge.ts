@@ -41,5 +41,5 @@ export function createMessage(options: Message, constants) {
     return `🌉 Bridged *${numWithCommas((Number(options.Mint.amount) / 1e6).toFixed(3))} Million CERBY* ($${numWithCommas((Number(options.Mint.amount) * Number(options.price)).toFixed(2))}) from ${options.Burn.symbol} to ${options.Mint.symbol} chain\n` +
         `From address: ${scanByChain.createLink(ScanText.ScanType.account, options.Burn.sender)}\n\n` +
         `${generateDots(Number(options.Mint.amount) * Number(options.price), constants, '🟠')}\n\n` +
-        `🌉 [Bridge](https://bridge.cerby.fi) | ${scanByChain.createLink(ScanText.ScanType.tx, options.Mint.txHash)} | ${CerbyFinance}`;
+        `🌉 [Bridge](https://bridge.cerby.fi) | ${scanByChain.createLink(ScanText.ScanType.tx, options.Mint.txHash)} ${CerbyFinance}`;
 }

@@ -1,4 +1,4 @@
-FROM node:16-alpine3.12
+FROM node:lts-alpine
 
 WORKDIR /app
 COPY ./feed-telegram-bot/package*.json .

@@ -1,11 +1,12 @@
-FROM node:16-alpine3.12
+FROM node:lts-alpine
 
 WORKDIR /app
 COPY ./feed-parser/package*.json .
+RUN npm install
+
 COPY ./feed-parser ./feed-parser
 COPY ./config.json .
 
-RUN npm install
 WORKDIR /app/feed-parser/
 RUN npm run build
 

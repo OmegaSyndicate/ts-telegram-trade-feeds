@@ -2,10 +2,10 @@
     "mainWorkerName": "mainWorker",
     "workerPoll": 100,
     "kafkaSettings": {
-        "brokers": [ "10.0.1.32:9092" ]
+        "brokers": [ "b-2.feedparserkafka.35szrc.c5.kafka.eu-central-1.amazonaws.com:9092","b-3.feedparserkafka.35szrc.c5.kafka.eu-central-1.amazonaws.com:9092","b-1.feedparserkafka.35szrc.c5.kafka.eu-central-1.amazonaws.com:9092" ]
     },
     "logsChat": {
-        "channel": -605794472
+        "channel": "@feedlogs"
     },
     "tokens": [
        {

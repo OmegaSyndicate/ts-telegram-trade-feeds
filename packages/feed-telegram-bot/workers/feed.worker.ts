@@ -45,11 +45,11 @@ parentPort.on("message", async (value) => {
     // worker threads do not have multiple listeners available for passing different event,
     // therefore add one onMessage listener, and pass an object with commands/data from main thread
     if (value?.exit) {
-    // clean up
-    const message = `Worker ${workerInfo} stopped`;
-    await logger.log(message);
-    console.log(message);
-    process.exit(0);
+        // clean up
+        const message = `Worker ${workerInfo} stopped`;
+        await logger.log(message);
+        console.log(message);
+        process.exit(0);
     }
     if(value?.ping) {
         parentPort.postMessage({ workerInfo, isRunning: true, stats })

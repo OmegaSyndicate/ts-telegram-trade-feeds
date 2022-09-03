@@ -1,7 +1,7 @@
-import { traceDeprecation } from "process";
-import { request } from "../../shared/helpers/request";
+import { request } from "../helpers/request";
 
 // GET https://www.mexc.com/open/api/v2/market/deals?symbol=cspr_usdt
+
 
 export async function* sync(latestMessage, settings, logger) {
     while(true) {
@@ -24,7 +24,7 @@ async function makeRequest(settings, logger, latestString?) {
 
     if(latestString) {
         const latest: Transaction = JSON.parse(latestString);
-        data = data.reverse().filter((transaction: Transaction) => new Date(transaction.trade_time) > new Date(latest.trade_time));
+        data = data.filter((transaction: Transaction) => new Date(transaction.trade_time) > new Date(latest.trade_time));
     } 
     
     return data.filter((t) => (+t.trade_quantity * +t.trade_price) >= settings.minUSD).map(t => JSON.stringify(t));

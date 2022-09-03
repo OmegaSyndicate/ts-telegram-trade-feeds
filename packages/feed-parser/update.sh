@@ -1,9 +1,4 @@
-export $(grep -v '^#' .env | xargs)
-
-ssh-keygen -F bitbucket.org || ssh-keyscan bitbucket.org >>~/.ssh/known_host
-
-git pull
-
+aws ecr-public get-login-password --region us-east-1 --profile defiplaza | docker login --username AWS --password-stdin public.ecr.aws/m8q3l0g8
 docker build -t feed-parser -f ./Dockerfile ..
-docker service update --image feed-parser:latest feed-parser-worker --force
-docker rmi $(docker images -f "dangling=true" -q)
+docker tag feed-parser:latest public.ecr.aws/m8q3l0g8/feed-parser:latest 
+docker push public.ecr.aws/m8q3l0g8/feed-parser:latest

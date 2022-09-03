@@ -26,5 +26,5 @@
 //             `${options.feedType == "uniswapBuy" ? "Bought" : "Sold"} *${numWithCommas(Math.floor(options.amountWise * 1000) / 1000)} WISE* for *${numWithCommas(Math.floor(options.amountWiseInEth * 1000) / 1000)} ETH* on Uniswap (Gas Fee: $${numWithCommas(Math.ceil(options.transactionFeeInUsd))})\n\n` +
 //             `${generateDots(options, constants)}\n\n` +
 //             `From address: [${shortenAddress(options.fromAddress)}](${createEtherscanLink("address", options.fromAddress)})\n\n` +
-//             `🦄 [Uniswap](https://v2.info.uniswap.org/pair/${constants.uniswapPair}) | 📶 [Tx Hash](${createEtherscanLink("tx", options.transactionHash)}) | ${CerbyFinance}`
+//             `🦄 [Uniswap](https://v2.info.uniswap.org/pair/${constants.uniswapPair}) | 📶 [Tx Hash](${createEtherscanLink("tx", options.transactionHash)}) ${CerbyFinance}`
 // }

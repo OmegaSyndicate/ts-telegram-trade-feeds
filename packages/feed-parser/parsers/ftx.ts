@@ -9,6 +9,7 @@ export async function* sync(latestMessage, settings, logger) {
     }
 }
 
+
 async function makeRequest(settings, logger, latestString?) {
     const fromTimestamp = (latestString ? new Date(JSON.parse(latestString).time).getTime() : new Date().getTime() - 600 * 1e3) / 1e3;
     const toTimestamp = new Date().getTime() / 1e3;

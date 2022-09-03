@@ -35,10 +35,10 @@ export function createMessage(options: Message, constants) {
     const pairTokenStable = options.pair[`token${+!currentTokenNum}`].symbol.toLowerCase().includes('usd');
     const priceUSD = pairTokenStable ? priceByPairToken : +options.amountUSD / +amountCurrentToken;
 
-    return `${options.feedType == "buy" ? "🚀" : "👹"} *1 ${constants.token} = ${Number(priceUSD).toFixed(getDoubleOffset(priceUSD))} ${pairTokenStable ? pairTokenSymbol : `USD (${priceByPairToken.toFixed(getDoubleOffset(priceByPairToken))} ${pairTokenSymbol})`}*\n` +
-            `${options.feedType == "buy" ? "Bought" : "Sold"} *${numWithCommas((+amountCurrentToken).toFixed(getDoubleOffset(+amountCurrentToken)))} ${constants.token}* for *${numWithCommas((+amountPairToken).toFixed(getDoubleOffset(+amountPairToken)))} ${pairTokenSymbol}${pairTokenStable ? '' : ` ($${numWithCommas(Math.ceil(+options.amountUSD))})`}* on Uniswap V2\n\n` +
+    return `${options.feedType == "buy" ? "🚀" : "👹"} *1 ${constants.token} = ${Number(priceUSD).toFixed(getDoubleOffset(priceUSD))} ${pairTokenStable ? pairTokenSymbol : `USD`}*\n` +
+            `${options.feedType == "buy" ? "Bought" : "Sold"} *${numWithCommas((+amountCurrentToken).toFixed(getDoubleOffset(+amountCurrentToken)))} ${constants.token}* for *${numWithCommas((+amountPairToken).toFixed(getDoubleOffset(+amountPairToken)))} ${pairTokenSymbol}${pairTokenStable ? '' : ` (${numWithCommas(Math.ceil(+options.amountUSD))} USD)`}* on Uniswap V2\n\n` +
             `${generateDots(+options.amountUSD, constants, options.feedType == "buy" ? "🟢" : "🔴")}\n\n` +
             `From address: ${ScanText.createScanText(ScanText.ScanChain.ETH, ScanText.ScanType.account, options.from)}\n\n` +
-            `🦄 [Uniswap V2](https://v2.info.uniswap.org/pair/${options.pair.id}) | ${ScanText.createScanText(ScanText.ScanChain.ETH, ScanText.ScanType.tx, options.transaction.id)} | 📊 [Dextools](https://www.dextools.io/app/ether/pair-explorer/${options.pair.id}) | ${CerbyFinance}`
+            `🦄 [Uniswap V2](https://v2.info.uniswap.org/pair/${options.pair.id}) | ${ScanText.createScanText(ScanText.ScanChain.ETH, ScanText.ScanType.tx, options.transaction.id)} | 📊 [Dextools](https://www.dextools.io/app/ether/pair-explorer/${options.pair.id}) ${CerbyFinance}`
 }
 

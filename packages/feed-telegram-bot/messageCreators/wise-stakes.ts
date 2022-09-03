@@ -86,5 +86,5 @@ export function createMessage(options: Message, constants, logger: Logger) {
             `${generateDots(fromWei(options.principal) * options.price, constants, boundEmoji)}\n\n` +
             additionalInfo +
             `From address: ${ScanText.createScanText(ScanText.ScanChain.ETH, ScanText.ScanType.account, options.staker)}\n\n` +
-            `${ScanText.createScanText(ScanText.ScanChain.ETH, ScanText.ScanType.tx, options.feedType == 'stakeStarted' ? options.startTx : options.endTx)} | ${CerbyFinance}`
+            `${ScanText.createScanText(ScanText.ScanChain.ETH, ScanText.ScanType.tx, options.feedType == 'stakeStarted' ? options.startTx : options.endTx)} ${CerbyFinance}`
 }
